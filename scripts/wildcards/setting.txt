@@ -1,0 +1,83 @@
+Setting: in the background a medieval ((enchanted forest)), fantasy art, towering trees, soft green glow, mysterious lighting, rays of light breaking through leaves, mist swirling, ethereal and magical mood
+Setting: in the background a medieval ((sorcerer's tower)), fantasy art, spiral staircase, bookshelves filled with tomes, candlelight flickering, rays of light through a small window, mysterious symbols, arcane and enigmatic
+Setting: in the background a medieval ((fantasy courtyard)), cobblestone paving, ivy climbing up stone walls, archways, natural sunlight, flowerbeds, soft shadows, vibrant yet old-world charm
+Setting: in the background a medieval ((wizard's study)), fantasy art, cluttered wooden desk, open spellbook, vials glowing faintly, candles, parchment scrolls, dusty light, mystic and scholarly aura
+Setting: in the background a medieval ((haunted crypt)), old stone tombs, cobwebs hanging, pale moonlight filtering in, damp air, faint glow of ethereal blue, eerie and unsettling atmosphere
+Setting: in the background a medieval ((castle battlements)), stone walls, darkening sky, torchlight flickering, worn stone steps, banners fluttering in the breeze, distant horizon, watchful and suspenseful mood
+Setting: in the background a medieval ((fantasy bathhouse)), warm steam rising, sunlight through ornate window, carved wooden benches, tiled stone pool, soft ripples, warm candles glowing, tranquil and luxurious
+Setting: in the background a medieval ((magic library)), old dusty books, fantasy art, ancient scrolls scattered, mysterious lighting, warm ambient glow, tall ladders, stacks of arcane tomes, mystical knowledge-filled atmosphere
+Setting: in the background a medieval ((fortress gatehouse)), heavy wooden doors, guard's quarters in the shadows, torchlight on stone walls, cool evening air, soft light through arrow slits, alert and fortified
+Setting: in the background a medieval ((cursed grove)), twisted trees, dim sunlight, creeping mist, glowing fungi on tree trunks, shadowed corners, strange symbols on the ground, foreboding and mysterious
+Setting: in the background a medieval ((market square)), cobblestone ground, lively vendors, colourful tents, baskets of produce, bright midday sunlight, the murmur of people, bustling and rustic atmosphere
+Setting: in the background a medieval ((fantasy temple)), massive stone pillars, rays of sunlight, coloured glass windows, shadows falling across stone floors, sacred altar, candles flickering, ancient and serene
+Setting: in the background a medieval ((enchanted smithy)), hot forge glowing, sparks in the air, enchanted tools hanging, rough-hewn stone floor, orange glow from forge fire, mysterious artifacts, hardworking and magical
+Setting: in the background a medieval ((witch's hut)), dark wooden shelves, dried herbs hanging, small cauldron bubbling, dim lighting, warm firelight, strange symbols on the wall, secluded and mysterious atmosphere
+Setting: in the background a medieval ((royal garden)), trimmed hedges, stone statues, colourful blooms, soft natural lighting, bees humming, ivy-covered gazebo, elegant and peaceful
+Setting: in the background a medieval ((forgotten ruins)), overgrown stone walls, broken statues, shafts of light through gaps, moss covering surfaces, mist swirling, ancient and eerie mood
+Setting: in the background a medieval ((archery range)), hay targets lined up, wooden bows resting, rays of sunlight, dust particles in the air, warm natural light, focused and skillful atmosphere
+Setting: in the background a medieval ((hunter's lodge)), animal pelts, hanging herbs, stone fireplace glowing, rays of warm light through small window, hunting trophies, rough-hewn wooden furniture, rustic and survivalist
+Setting: in the background a medieval ((fantasy banquet)), wooden tables laden with food, candelabras lighting the room, stone walls, tapestries hanging, laughter and cheer, warm firelight, celebratory and lively atmosphere
+Setting: in the background a medieval ((druid circle)), standing stones, mist weaving between, moss-covered ground, soft natural light, flowers scattered among stones, runes glowing faintly, sacred and mystical mood
+Setting: Medieval Tavern, in the background a rustic ((tavern interior)), wooden tables and benches, candlelight flickering, stone walls, barrels in the corner, the scent of ale, warm and lively atmosphere
+Setting: Castle Chamber, in the background a medieval ((castle chamber)), heavy wooden beams, soft daylight through tall windows, tapestries on walls, stone fireplace crackling, regal and archaic mood
+Setting: 18th Century Cottage, in the background a rustic ((cottage interior)), wooden beams, warm firelight from hearth, simple wooden furniture, dried herbs hanging, stone floor, cozy and humble atmosphere
+Setting: Blacksmith Workshop, in the background a medieval ((blacksmith workshop)), dim natural light, glowing forge, anvil and tools scattered, ironwork resting on tables, sound of hammering, hardworking and earthy setting
+Setting: Apothecary, in the background a 17th-century ((apothecary)), wooden shelves with glass jars, dried herbs hanging, candlelight, mortar and pestle on counter, scent of dried flowers, old-world medical charm
+Setting: Alchemist's Study, in the background a rustic ((alchemist's study)), cluttered workbench, glass vials and flasks, warm firelight, parchment scrolls, books stacked, mysterious and scholarly atmosphere
+Setting: Village Bakery, in the background a 19th-century ((village bakery)), wooden shelves, flour-dusted surfaces, fresh loaves on tables, warm natural light, fire crackling in brick oven, comforting scent of bread
+Setting: Manor Drawing Room, in the background a 19th-century ((manor drawing room)), sunlight through large windows, plush furniture, oil paintings on walls, fireplace with crackling fire, refined yet cozy setting
+Setting: Medieval Banquet Hall, in the background a grand ((banquet hall)), long wooden table, flickering candlelight, high ceilings, stone walls, tapestries, warm and celebratory medieval atmosphere
+Setting: Victorian Library, in the background a 19th-century ((library)), rows of old books, warm candlelight, large mahogany desk, velvet armchairs, natural light through arched windows, studious and elegant mood
+Setting: Sailor's Tavern, in the background a 17th-century ((sailor's tavern)), low wooden beams, flickering oil lamps, nautical decor, barrels of rum, rough-hewn tables, loud chatter, lively and rough atmosphere
+Setting: Barn Loft, in the background a rustic ((barn loft)), warm natural light through open slats, hay bales stacked, wooden beams, ladder resting against wall, dappled sunlight, earthy and tranquil mood
+Setting: Medieval Chapel, in the background a small ((medieval chapel)), tall arched windows, soft daylight illuminating stone walls, wooden pews, flickering candles, solemn and serene atmosphere
+Setting: Hunting Lodge, in the background an 18th-century ((hunting lodge)), mounted antlers on walls, rustic wooden decor, fireplace with roaring fire, daylight filtering in, heavy furniture, warm and secluded
+Setting: Carpenter's Workshop, in the background an 18th-century ((carpenter's workshop)), wooden beams, sunlight streaming in, hand tools on benches, sawdust on floor, unfinished furniture pieces, industrious and simple
+Setting: Village Market, in the background a rustic ((village market)), stalls covered with cloth awnings, fresh produce displayed, sunlight dappled, people in traditional attire, livestock nearby, busy and colourful scene
+Setting: Manor Garden, in the background an 18th-century ((manor garden)), well-kept flower beds, marble statue, gravel path, dappled sunlight, wooden benches, tall hedges, serene and refined open-air setting
+Setting: Castle Kitchen, in the background a medieval ((castle kitchen)), warm firelight, hanging herbs and game, stone walls, large wooden tables, pots and pans, warm and bustling with activity
+Setting: Sailor’s Quarters, in the background a 17th-century ((ship's cabin)), wooden beams, hammocks strung up, lantern swinging, rope coiled in corner, sound of creaking timbers, cozy and cramped ship interior
+Setting: in the background a medieval ((fantasy throne room)), fantasy art, darkness, mysterious lighting, rays of light, haze, backlight, rim light
+Setting: in the background a medieval ((dungeon)), fantasy art, darkness, old basement dungeon, mysterious lighting, rays of light, haze, backlight, rim light, scary mood
+Setting: in the background a medieval ((dirty basement)) room, fantasy art, darkness, old stone basement, mysterious lighting, rays of light, haze, backlight, rim light, scary mood, dark
+Setting: in the background a medieval ((fantasy tavern)), fantasy art, festive interior, natural lighting, rays of light, bright candles, stone and wood interior, backlight, rim light, warm
+Setting: in the background a medieval ((fantasy chamber)), fantasy art, darkness, mysterious lighting, rays of light, haze, backlight, rim light
+Setting: in the background a medieval ((fantasy bedroom)), fantasy art, darkness, mysterious lighting, rays of light, haze, backlight, rim light, candles, old lamps, stone walls, old wooden bed, ancient
+Setting: in the background a medieval ((fantasy hall)), fantasy art, darkness, mysterious lighting, rays of light, haze, backlight, rim light
+Setting: in the background a medieval ((fantasy stables)), fantasy art, straw and dirt, dust, litter, manure, darkness, mysterious lighting, rays of light, haze, backlight, rim light
+Setting: Modern Hotel Room, in the background a modern ((hotel room)), contemporary decor, warm lighting, sun rays through sheer curtains, plush furniture, polished surfaces, cozy atmosphere
+Setting: Modern Classroom, in the background a modern ((classroom)), daylight through large windows, bright overhead lighting, sleek furniture, smartboard on wall, professional atmosphere
+Setting: Modern Cafeteria, in the background a modern ((cafeteria)), bright lighting, sunlight streaming in, stainless steel counters, warm spotlights, subtle haze, chatter in the air
+Setting: Urban Apartment, in the background a modern ((apartment interior)), urban chic style, ambient lighting, sunlight through blinds, soft furniture, designer lamps, cozy atmosphere
+Setting: Corporate Office, in the background a modern ((corporate office)), bright natural light, polished surfaces, cool overhead lighting, glass partitions, computer screens glowing softly, professional
+Setting: Luxury Restaurant,in the background a modern ((luxury restaurant)), dim ambient lighting, elegant decor, table lamps, chandeliers, polished cutlery, candles flickering, refined atmosphere
+Setting: Hospital Room,in the background a modern ((hospital room)), clinical lighting, natural daylight, sterile but comforting, medical monitors glowing, clean and calm
+Setting: University Lecture Hall, in the background a modern ((university lecture hall)), bright overhead lighting, projection screen, tiered seating, soft reflections from desks, warm wall-mounted fixtures
+Setting: Modern Library, in the background a modern ((library)), rows of bookshelves, warm overhead lights, soft lighting on tables, daylight filtering through windows, cozy reading area, calm mood
+Setting: Sauna, in the background a modern ((sauna)), warm wooden interior, soft ambient lighting, steam rising, gentle glow from heated stones, peaceful atmosphere
+Setting: Locker Room, in the background a modern ((locker room)), metal lockers, bright overhead lights, tiled floor, benches, reflections from polished surfaces, athletic mood
+Setting: Bathroom, in the background a modern ((bathroom)), sleek tiles, large mirror, soft ambient lighting, glass shower partition, subtle reflections, clean and minimal
+Setting: Kitchen, in the background a modern ((kitchen)), stainless steel appliances, natural light through a window, bright overhead lighting, marble countertops, warm wooden cabinets, functional and inviting
+Setting: Gym, in the background a modern ((gym)), bright lighting, weight racks, exercise machines, large mirrors reflecting movement, rubber flooring, energetic atmosphere
+Setting: School Showers, in the background a modern ((school showers)), tiled walls and floors, multiple shower heads, bright overhead lighting, water running, clean but utilitarian
+Setting: Pool Room, in the background a modern ((pool room)), large indoor pool, bright natural light from large windows, soft reflections on the water, poolside tiles, lifeguard chair, fresh atmosphere
+Setting: Music Studio, in the background a modern ((music studio)), soundproof panels, warm ambient lighting, instruments scattered around, microphones set up, computer screens glowing, creative energy in the air 
+Setting: Art Studio, in the background a modern ((art studio)), easels with unfinished paintings, scattered brushes, warm natural light, canvas cloth on tables, splashes of paint, creative and vibrant 
+Setting: Dance Studio, in the background a modern ((dance studio)), large wall mirrors, polished wooden floors, bright lighting, sunlight filtering in, ballet barres, energetic and focused atmosphere 
+Setting: Fashion Boutique, in the background a modern ((fashion boutique)), bright display lights, elegant clothing racks, plush carpeting, large fitting mirrors, warm lighting, sophisticated mood 
+Setting: College Dormitory, in the background a modern ((college dorm)), warm ambient lighting, study desk, personal decor, soft bedspread, shelves filled with books, youthful and cozy 
+Setting: Coffee Shop, in the background a modern ((coffee shop)), daylight streaming through large windows, warm overhead lights, wooden counters, espresso machines, the hum of quiet conversation 
+Setting: Beauty Salon, in the background a modern ((beauty salon)), bright lighting, large mirrors, salon chairs, hair dryers hanging, sleek decor, the scent of hair products, professional but relaxed 
+Setting: Spa Room, in the background a modern ((spa room)), soft ambient lighting, gentle music playing, plush massage table, warm tones, aromatic candles, serene and calming 
+Setting: Gaming Lounge, in the background a modern ((gaming lounge)), dim ambient lighting, computer screens glowing, comfortable chairs, soft LED strips, posters on walls, focused and competitive atmosphere 
+Setting: Study Lounge, in the background a modern ((study lounge)), bright natural lighting, couches and armchairs, coffee tables with books, quiet study nooks, large windows, relaxed academic environment 
+Setting: Photography Studio, in the background a modern ((photography studio)), bright diffused lighting, backdrops set up, camera gear scattered, softbox lights, clean minimalist decor, creative atmosphere 
+Setting: Modern Terrace, in the background a modern ((terrace)), outdoor seating, warm wooden flooring, string lights hanging, potted plants, soft sunlight, cozy and inviting open-air environment 
+Setting: Summer Camp Cabin, in the background a modern ((cabin interior)), rustic wooden walls, bunk beds with blankets, warm overhead lights, personal items scattered, large windows with forest views, comforting mood 
+Setting: Bookstore, in the background a modern ((bookstore)), rows of bookshelves, warm spotlights, soft ambient music, tables with open books, daylight filtering through the windows, inviting and curious atmosphere 
+Setting: Indoor Garden, in the background a modern ((indoor garden)), lush greenery, natural daylight, water feature, bright overhead lights, earthy tones, peaceful and rejuvenating environment 
+Setting: Film Set, in the background a modern ((film set)), bright studio lighting, props arranged, cameras on tripods, cables scattered, ambient creative buzz, focused and energetic mood 
+Setting: Cocktail Bar, in the background a modern ((cocktail bar)), dim warm lighting, bartenders working, bottles arranged on backlit shelves, plush barstools, the murmur of conversation, refined and lively 
+Setting: Study Group Room, in the background a modern ((study group room)), large table, scattered notebooks and laptops, whiteboard with markers, natural lighting, comfortable chairs, collaborative academic energy 
+Setting: Indoor Climbing Gym, in the background a modern ((climbing gym)), bright lighting, climbing walls with coloured holds, padded floor, ropes hanging, chalk marks scattered, energetic and adventurous atmosphere
+

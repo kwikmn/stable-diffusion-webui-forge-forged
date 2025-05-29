@@ -40,7 +40,6 @@ notification.mp3
 /SwinIR
 /textual_inversion
 .vscode
-/extensions
 /test/stdout.txt
 /test/stderr.txt
 /cache.json*
@@ -55,3 +54,9 @@ trace.json
 /test/results.xml
 coverage.xml
 **/tests/**/expectations
+# Local-only and runtime artifacts
+/system/
+/system.7z.*
+/transformers-cache/
+/stable-diffusion-webui-forge-forged-mirror/
+

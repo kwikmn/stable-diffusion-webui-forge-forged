@@ -1,0 +1,11 @@
+happy
+disgust
+smug
+flustered
+confused
+angry
+smile
+frown
+furled brow
+grimace
+naughty face

@@ -1,0 +1,34 @@
+Setting: Modern Hotel Room, in the background a modern ((hotel room)), contemporary decor, warm lighting, sun rays through sheer curtains, plush furniture, polished surfaces, cozy atmosphere
+Setting: Modern Classroom, in the background a modern ((classroom)), daylight through large windows, bright overhead lighting, sleek furniture, smartboard on wall, professional atmosphere
+Setting: Modern Cafeteria, in the background a modern ((cafeteria)), bright lighting, sunlight streaming in, stainless steel counters, warm spotlights, subtle haze, chatter in the air
+Setting: Urban Apartment, in the background a modern ((apartment interior)), urban chic style, ambient lighting, sunlight through blinds, soft furniture, designer lamps, cozy atmosphere
+Setting: Corporate Office, in the background a modern ((corporate office)), bright natural light, polished surfaces, cool overhead lighting, glass partitions, computer screens glowing softly, professional
+Setting: Luxury Restaurant,in the background a modern ((luxury restaurant)), dim ambient lighting, elegant decor, table lamps, chandeliers, polished cutlery, candles flickering, refined atmosphere
+Setting: Hospital Room,in the background a modern ((hospital room)), clinical lighting, natural daylight, sterile but comforting, medical monitors glowing, clean and calm
+Setting: University Lecture Hall, in the background a modern ((university lecture hall)), bright overhead lighting, projection screen, tiered seating, soft reflections from desks, warm wall-mounted fixtures
+Setting: Modern Library, in the background a modern ((library)), rows of bookshelves, warm overhead lights, soft lighting on tables, daylight filtering through windows, cozy reading area, calm mood
+Setting: Sauna, in the background a modern ((sauna)), warm wooden interior, soft ambient lighting, steam rising, gentle glow from heated stones, peaceful atmosphere
+Setting: Locker Room, in the background a modern ((locker room)), metal lockers, bright overhead lights, tiled floor, benches, reflections from polished surfaces, athletic mood
+Setting: Bathroom, in the background a modern ((bathroom)), sleek tiles, large mirror, soft ambient lighting, glass shower partition, subtle reflections, clean and minimal
+Setting: Kitchen, in the background a modern ((kitchen)), stainless steel appliances, natural light through a window, bright overhead lighting, marble countertops, warm wooden cabinets, functional and inviting
+Setting: Gym, in the background a modern ((gym)), bright lighting, weight racks, exercise machines, large mirrors reflecting movement, rubber flooring, energetic atmosphere
+Setting: School Showers, in the background a modern ((school showers)), tiled walls and floors, multiple shower heads, bright overhead lighting, water running, clean but utilitarian
+Setting: Pool Room, in the background a modern ((pool room)), large indoor pool, bright natural light from large windows, soft reflections on the water, poolside tiles, lifeguard chair, fresh atmosphere
+Setting: Music Studio, in the background a modern ((music studio)), soundproof panels, warm ambient lighting, instruments scattered around, microphones set up, computer screens glowing, creative energy in the air 
+Setting: Art Studio, in the background a modern ((art studio)), easels with unfinished paintings, scattered brushes, warm natural light, canvas cloth on tables, splashes of paint, creative and vibrant 
+Setting: Dance Studio, in the background a modern ((dance studio)), large wall mirrors, polished wooden floors, bright lighting, sunlight filtering in, ballet barres, energetic and focused atmosphere 
+Setting: Fashion Boutique, in the background a modern ((fashion boutique)), bright display lights, elegant clothing racks, plush carpeting, large fitting mirrors, warm lighting, sophisticated mood 
+Setting: College Dormitory, in the background a modern ((college dorm)), warm ambient lighting, study desk, personal decor, soft bedspread, shelves filled with books, youthful and cozy 
+Setting: Coffee Shop, in the background a modern ((coffee shop)), daylight streaming through large windows, warm overhead lights, wooden counters, espresso machines, the hum of quiet conversation 
+Setting: Beauty Salon, in the background a modern ((beauty salon)), bright lighting, large mirrors, salon chairs, hair dryers hanging, sleek decor, the scent of hair products, professional but relaxed 
+Setting: Spa Room, in the background a modern ((spa room)), soft ambient lighting, gentle music playing, plush massage table, warm tones, aromatic candles, serene and calming 
+Setting: Gaming Lounge, in the background a modern ((gaming lounge)), dim ambient lighting, computer screens glowing, comfortable chairs, soft LED strips, posters on walls, focused and competitive atmosphere 
+Setting: Study Lounge, in the background a modern ((study lounge)), bright natural lighting, couches and armchairs, coffee tables with books, quiet study nooks, large windows, relaxed academic environment 
+Setting: Photography Studio, in the background a modern ((photography studio)), bright diffused lighting, backdrops set up, camera gear scattered, softbox lights, clean minimalist decor, creative atmosphere 
+Setting: Modern Terrace, in the background a modern ((terrace)), outdoor seating, warm wooden flooring, string lights hanging, potted plants, soft sunlight, cozy and inviting open-air environment 
+Setting: Summer Camp Cabin, in the background a modern ((cabin interior)), rustic wooden walls, bunk beds with blankets, warm overhead lights, personal items scattered, large windows with forest views, comforting mood 
+Setting: Bookstore, in the background a modern ((bookstore)), rows of bookshelves, warm spotlights, soft ambient music, tables with open books, daylight filtering through the windows, inviting and curious atmosphere Setting: Indoor Garden, in the background a modern ((indoor garden)), lush greenery, natural daylight, water feature, bright overhead lights, earthy tones, peaceful and rejuvenating environment 
+Setting: Film Set, in the background a modern ((film set)), bright studio lighting, props arranged, cameras on tripods, cables scattered, ambient creative buzz, focused and energetic mood 
+Setting: Cocktail Bar, in the background a modern ((cocktail bar)), dim warm lighting, bartenders working, bottles arranged on backlit shelves, plush barstools, the murmur of conversation, refined and lively 
+Setting: Study Group Room, in the background a modern ((study group room)), large table, scattered notebooks and laptops, whiteboard with markers, natural lighting, comfortable chairs, collaborative academic energy 
+Setting: Indoor Climbing Gym, in the background a modern ((climbing gym)), bright lighting, climbing walls with coloured holds, padded floor, ropes hanging, chalk marks scattered, energetic and adventurous atmosphere

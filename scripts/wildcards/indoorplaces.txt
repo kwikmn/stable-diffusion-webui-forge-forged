@@ -1,0 +1,79 @@
+bathroom
+bathtub
+toilet stall
+shower
+bedroom
+hotel room
+messy room
+otaku room
+cafeteria
+changing room
+classroom
+clubroom
+conservatory
+courtroom
+dining room
+dressing room
+dungeon
+prison cell
+fitting room
+gym
+locker room
+gym storeroom
+infirmary
+kitchen
+laboratory
+library
+living room
+office
+cubicle
+pool house
+stage
+staff room
+storage room
+closet
+workshop
+phone booth
+apartment
+aquarium
+arcade
+bar
+busy cafe
+church
+garage
+gym
+hospital room
+hotel lobby
+library
+mall
+church
+monastery
+cloister
+mosque
+museum
+art gallery
+nightclub
+office
+pagoda
+prison
+restaurant
+school
+shack
+shrine
+shop
+bakery
+bookstore
+convenience store
+flower shop
+pharmacy
+salon
+supermarket
+temple
+theater
+movie theater
+train station
+vehicle interior
+airplane interior
+bus interior
+car interior
+train interior

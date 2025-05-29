@@ -1,0 +1,45 @@
+in a shopping mall
+in a clothing store
+in a school cafeteria
+in a movie theatre
+at a public pool
+in a shoestore
+in a janitor's closet
+in a public restroom
+in an american diner
+on a tram
+on a ferry
+in an airport terminal
+at a train station platform
+on a bike-sharing station
+on a trolley
+at a ride-sharing pickup location
+in a helicopter tour
+in a cable car
+at a bus terminal
+on a bike path
+at a taxi rank
+in a car rental agency
+in a transportation hub
+on a scenic train ride
+at a bus stop
+at a train terminal
+in a subway train
+on a bus
+in the back seat of a taxi
+in a park
+in a library
+at a museum
+in a gym
+in a hotel lobby
+at a concert venue
+on a public transportation vehicle
+in a grocery store
+in a coffee shop
+in a fast food restaurant
+at a amusement park
+at a beach
+in a government building
+in a hospital waiting room
+at an airport
+in a sporting event stadium
