@@ -1431,20 +1431,6 @@ class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
         return self.sample_hr_pass(samples, decoded_samples, seeds, subseeds, subseed_strength, prompts)
 
     def sample_hr_pass(self, samples, decoded_samples, seeds, subseeds, subseed_strength, prompts):
-        print("DEBUG: Inside sample_hr_pass")
-        print(f"DEBUG: Initial self.hr_prompt string (at obj creation): '{self.hr_prompt}'")
-        print(f"DEBUG: self.user_left_hr_prompt_empty: {self.user_left_hr_prompt_empty}")
-        if hasattr(self, '_current_wildcard_resolved_batch'):
-            print(f"DEBUG: self._current_wildcard_resolved_batch: {self._current_wildcard_resolved_batch}")
-        else:
-            print("DEBUG: self._current_wildcard_resolved_batch not found")
-        # Ensure self.hr_prompts exists before trying to print it; it's typically populated by parse_extra_network_prompts, called from setup_conds.
-        # However, sample_hr_pass can be called directly in some flows. For safety during debug:
-        if hasattr(self, 'hr_prompts') and self.hr_prompts is not None:
-            print(f"DEBUG: Current self.hr_prompts (list for batch) BEFORE override attempt: {self.hr_prompts}")
-        else:
-            print(f"DEBUG: self.hr_prompts (list for batch) not yet populated or is None.")
-
         if shared.state.interrupted:
             return samples
 
@@ -1526,13 +1512,18 @@ class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
                 # Force recalculation of hr_c and hr_uc by clearing them
                 self.hr_c = None
                 self.hr_uc = None
+                # ---- ADD THIS SECTION TO UPDATE all_hr_prompts FOR METADATA ----
+                current_batch_start_index = self.iteration * self.batch_size
+                if hasattr(self, 'all_hr_prompts') and self.all_hr_prompts is not None:
+                    for i in range(len(self._current_wildcard_resolved_batch)):
+                        actual_index_in_job = current_batch_start_index + i
+                        if actual_index_in_job < len(self.all_hr_prompts):
+                            self.all_hr_prompts[actual_index_in_job] = self._current_wildcard_resolved_batch[i]
+                        else:
+                            # This case should ideally not happen if all_hr_prompts is sized for the whole job
+                            print(f"Warning: Index out of bounds when trying to update all_hr_prompts for metadata. Index: {actual_index_in_job}, Batch Prompt: {self._current_wildcard_resolved_batch[i]}")
+                # ---- END OF SECTION TO ADD ----
             # End of new/replacement conditional block
-
-            # DEBUG PRINT IMMEDIATELY AFTER (and before calculate_hr_conds)
-            if hasattr(self, 'hr_prompts') and self.hr_prompts is not None: # Check again in case it was just set
-                print(f"DEBUG: Current self.hr_prompts (list for batch) AFTER override attempt: {self.hr_prompts}")
-            else:
-                print(f"DEBUG: self.hr_prompts (list for batch) is None even after override attempt.")
 
             self.calculate_hr_conds()
 
