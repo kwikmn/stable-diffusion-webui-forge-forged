@@ -1232,6 +1232,9 @@ class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
 
         self.cached_hr_uc = StableDiffusionProcessingTxt2Img.cached_hr_uc
         self.cached_hr_c = StableDiffusionProcessingTxt2Img.cached_hr_c
+        # Add these lines:
+        self.user_left_hr_prompt_empty = (self.hr_prompt == '')
+        self.user_left_hr_negative_prompt_empty = (self.hr_negative_prompt == '')
 
     def calculate_target_resolution(self):
         if opts.use_old_hires_fix_width_height and self.applied_old_hires_behavior_to != (self.width, self.height):
@@ -1428,6 +1431,20 @@ class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
         return self.sample_hr_pass(samples, decoded_samples, seeds, subseeds, subseed_strength, prompts)
 
     def sample_hr_pass(self, samples, decoded_samples, seeds, subseeds, subseed_strength, prompts):
+        print("DEBUG: Inside sample_hr_pass")
+        print(f"DEBUG: Initial self.hr_prompt string (at obj creation): '{self.hr_prompt}'")
+        print(f"DEBUG: self.user_left_hr_prompt_empty: {self.user_left_hr_prompt_empty}")
+        if hasattr(self, '_current_wildcard_resolved_batch'):
+            print(f"DEBUG: self._current_wildcard_resolved_batch: {self._current_wildcard_resolved_batch}")
+        else:
+            print("DEBUG: self._current_wildcard_resolved_batch not found")
+        # Ensure self.hr_prompts exists before trying to print it; it's typically populated by parse_extra_network_prompts, called from setup_conds.
+        # However, sample_hr_pass can be called directly in some flows. For safety during debug:
+        if hasattr(self, 'hr_prompts') and self.hr_prompts is not None:
+            print(f"DEBUG: Current self.hr_prompts (list for batch) BEFORE override attempt: {self.hr_prompts}")
+        else:
+            print(f"DEBUG: self.hr_prompts (list for batch) not yet populated or is None.")
+
         if shared.state.interrupted:
             return samples
 
@@ -1503,16 +1520,16 @@ class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
                 extra_networks.activate(self, self.hr_extra_network_data)
 
         with devices.autocast():
-            # Start of inserted code
-            if not self.hr_prompt and hasattr(self, '_current_wildcard_resolved_batch') and self._current_wildcard_resolved_batch is not None:
-                # If the user did not specify a dedicated HR prompt,
-                # and the wildcard script has provided resolved prompts for the first pass of this batch,
-                # use those resolved prompts for the HR pass.
+            # Start of new/replacement conditional block
+            if self.user_left_hr_prompt_empty and hasattr(self, '_current_wildcard_resolved_batch') and self._current_wildcard_resolved_batch is not None:
                 self.hr_prompts = self._current_wildcard_resolved_batch
-                # Note: self.hr_negative_prompts will use its current default logic (uses main negative if empty).
-                # If wildcards were to apply to negative prompts, a similar mechanism for 
-                # p._current_wildcard_resolved_negative_batch would be needed.
-            # End of inserted code
+            # End of new/replacement conditional block
+
+            # DEBUG PRINT IMMEDIATELY AFTER (and before calculate_hr_conds)
+            if hasattr(self, 'hr_prompts') and self.hr_prompts is not None: # Check again in case it was just set
+                print(f"DEBUG: Current self.hr_prompts (list for batch) AFTER override attempt: {self.hr_prompts}")
+            else:
+                print(f"DEBUG: self.hr_prompts (list for batch) is None even after override attempt.")
 
             self.calculate_hr_conds()
 
