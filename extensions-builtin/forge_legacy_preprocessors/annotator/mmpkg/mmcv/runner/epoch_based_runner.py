@@ -171,10 +171,8 @@ class EpochBasedRunner(BaseRunner):
         # set `create_symlink` to False
         if create_symlink:
             dst_file = osp.join(out_dir, 'latest.pth')
-            if platform.system() != 'Windows':
-                mmcv.symlink(filename, dst_file)
-            else:
-                shutil.copy(filepath, dst_file)
+            # Always copy for Windows-only environment
+            shutil.copy(filepath, dst_file)
 
 
 @RUNNERS.register_module()

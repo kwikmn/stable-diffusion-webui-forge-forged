@@ -3,14 +3,6 @@ import torch
 from backend import memory_management
 
 
-def has_xpu() -> bool:
-    return memory_management.xpu_available
-
-
-def has_mps() -> bool:
-    return memory_management.mps_mode()
-
-
 def cuda_no_autocast(device_id=None) -> bool:
     return False
 

@@ -182,9 +182,9 @@ def open_folder(path):
     """Open a folder in the file manager of the respect OS."""
     # import at function level to avoid potential issues
     import gradio as gr
-    import platform
-    import sys
-    import subprocess
+    import platform # platform is already imported at the module level
+    import sys # sys is already imported at the module level
+    import subprocess # subprocess is already imported at the module level
 
     if not os.path.exists(path):
         msg = f'Folder "{path}" does not exist. after you save an image, the folder will be created.'
@@ -205,12 +205,9 @@ Requested path was: {path}
     path = os.path.normpath(path)
     if platform.system() == "Windows":
         os.startfile(path)
-    elif platform.system() == "Darwin":
-        subprocess.Popen(["open", path])
-    elif "microsoft-standard-WSL2" in platform.uname().release:
-        subprocess.Popen(["explorer.exe", subprocess.check_output(["wslpath", "-w", path])])
     else:
-        subprocess.Popen(["xdg-open", path])
+        # This is a Windows-only application, so other OS-specific folder opening is not supported.
+        print(f"Opening folder is not supported on this platform: {platform.system()}. Path: {path}")
 
 
 def load_file_from_url(
