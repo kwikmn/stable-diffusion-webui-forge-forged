@@ -1523,6 +1523,9 @@ class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
             # Start of new/replacement conditional block
             if self.user_left_hr_prompt_empty and hasattr(self, '_current_wildcard_resolved_batch') and self._current_wildcard_resolved_batch is not None:
                 self.hr_prompts = self._current_wildcard_resolved_batch
+                # Force recalculation of hr_c and hr_uc by clearing them
+                self.hr_c = None
+                self.hr_uc = None
             # End of new/replacement conditional block
 
             # DEBUG PRINT IMMEDIATELY AFTER (and before calculate_hr_conds)
