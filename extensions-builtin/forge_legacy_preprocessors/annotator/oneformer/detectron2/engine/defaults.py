@@ -123,7 +123,7 @@ Run on multiple machines:
     # PyTorch still may leave orphan processes in multi-gpu training.
     # Therefore we use a deterministic way to obtain port,
     # so that users are aware of orphan processes by seeing the port occupied.
-    port = 2**15 + 2**14 + hash(os.getuid() if sys.platform != "win32" else 1) % 2**14
+    port = 2**15 + 2**14 + hash(1) % 2**14 # Simplified for Windows-only
     parser.add_argument(
         "--dist-url",
         default="tcp://127.0.0.1:{}".format(port),
@@ -713,3 +713,5 @@ for _attr in ["model", "data_loader", "optimizer"]:
             lambda self, value, x=_attr: setattr(self._trainer, x, value),
         ),
     )
+
+[end of extensions-builtin/forge_legacy_preprocessors/annotator/oneformer/detectron2/engine/defaults.py]

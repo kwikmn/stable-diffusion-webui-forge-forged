@@ -86,33 +86,8 @@ def collect_env_info():
         data.append(("detectron2._C", f"not built correctly: {e}"))
 
         # print system compilers when extension fails to build
-        if sys.platform != "win32":  # don't know what to do for windows
-            try:
-                # this is how torch/utils/cpp_extensions.py choose compiler
-                cxx = os.environ.get("CXX", "c++")
-                cxx = subprocess.check_output("'{}' --version".format(cxx), shell=True)
-                cxx = cxx.decode("utf-8").strip().split("\n")[0]
-            except subprocess.SubprocessError:
-                cxx = "Not found"
-            data.append(("Compiler ($CXX)", cxx))
-
-            if has_cuda and CUDA_HOME is not None:
-                try:
-                    nvcc = os.path.join(CUDA_HOME, "bin", "nvcc")
-                    nvcc = subprocess.check_output("'{}' -V".format(nvcc), shell=True)
-                    nvcc = nvcc.decode("utf-8").strip().split("\n")[-1]
-                except subprocess.SubprocessError:
-                    nvcc = "Not found"
-                data.append(("CUDA compiler", nvcc))
-        if has_cuda and sys.platform != "win32":
-            try:
-                so_file = importlib.util.find_spec("detectron2._C").origin
-            except (ImportError, AttributeError):
-                pass
-            else:
-                data.append(
-                    ("detectron2 arch flags", detect_compute_compatibility(CUDA_HOME, so_file))
-                )
+        # Non-Windows specific logic removed
+        pass
     else:
         # print compilers that are used to build extension
         data.append(("Compiler", _C.get_compiler_version()))

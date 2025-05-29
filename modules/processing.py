@@ -1503,6 +1503,17 @@ class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
                 extra_networks.activate(self, self.hr_extra_network_data)
 
         with devices.autocast():
+            # Start of inserted code
+            if not self.hr_prompt and hasattr(self, '_current_wildcard_resolved_batch') and self._current_wildcard_resolved_batch is not None:
+                # If the user did not specify a dedicated HR prompt,
+                # and the wildcard script has provided resolved prompts for the first pass of this batch,
+                # use those resolved prompts for the HR pass.
+                self.hr_prompts = self._current_wildcard_resolved_batch
+                # Note: self.hr_negative_prompts will use its current default logic (uses main negative if empty).
+                # If wildcards were to apply to negative prompts, a similar mechanism for 
+                # p._current_wildcard_resolved_negative_batch would be needed.
+            # End of inserted code
+
             self.calculate_hr_conds()
 
         if self.scripts is not None:

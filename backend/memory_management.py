@@ -994,11 +994,11 @@ def pytorch_attention_flash_attention():
 
 def force_upcast_attention_dtype():
     upcast = args.force_upcast_attention
-    try:
-        if platform.mac_ver()[0] in ['14.5']:  # black image bug on OSX Sonoma 14.5
-            upcast = True
-    except:
-        pass
+    # try: # Removed macOS specific workaround
+    #     if platform.mac_ver()[0] in ['14.5']:  # black image bug on OSX Sonoma 14.5
+    #         upcast = True
+    # except:
+    #     pass
     if upcast:
         return torch.float32
     else:

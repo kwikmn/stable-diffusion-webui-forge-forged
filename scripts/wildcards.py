@@ -57,7 +57,9 @@ class Script(scripts.Script):
         output_images = []
         for batch_no in range(state.job_count):
             state.job = f"{batch_no+1} out of {state.job_count}"
-            p.prompt = all_prompts[batch_no*p.batch_size:(batch_no+1)*p.batch_size]
+            current_batch_prompts = all_prompts[batch_no*p.batch_size:(batch_no+1)*p.batch_size]
+            p.prompt = current_batch_prompts
+            p._current_wildcard_resolved_batch = current_batch_prompts
             if cmd_opts.enable_console_prompts:
                 print(f"wildcards.py: {p.prompt}")
             proc = process_images(p)
