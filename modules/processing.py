@@ -396,6 +396,17 @@ class StableDiffusionProcessing:
         return self.token_merging_ratio or opts.token_merging_ratio
 
     def setup_prompts(self):
+        # Store original unparsed prompts for gallery
+        if isinstance(self.prompt, list):
+            self.original_unparsed_prompts = [p for p in self.prompt]
+        else:
+            self.original_unparsed_prompts = [self.prompt] * (self.batch_size * self.n_iter)
+
+        if isinstance(self.negative_prompt, list):
+            self.original_unparsed_negative_prompts = [p for p in self.negative_prompt]
+        else:
+            self.original_unparsed_negative_prompts = [self.negative_prompt] * len(self.original_unparsed_prompts)
+
         if isinstance(self.prompt,list):
             self.all_prompts = self.prompt
         elif isinstance(self.negative_prompt, list):
@@ -1593,6 +1604,21 @@ class StableDiffusionProcessingTxt2Img(StableDiffusionProcessing):
 
         self.all_hr_prompts = [shared.prompt_styles.apply_styles_to_prompt(x, self.styles) for x in self.all_hr_prompts]
         self.all_hr_negative_prompts = [shared.prompt_styles.apply_negative_styles_to_prompt(x, self.styles) for x in self.all_hr_negative_prompts]
+
+        # Store the version of HR prompts that would be used (after defaulting and style application if any)
+        if isinstance(self.original_unparsed_hr_prompt_raw_input, list):
+            self.final_original_unparsed_hr_prompts = [p for p in self.original_unparsed_hr_prompt_raw_input]
+        elif self.original_unparsed_hr_prompt_raw_input == '' and hasattr(self, 'original_unparsed_prompts'):
+             self.final_original_unparsed_hr_prompts = self.original_unparsed_prompts[:len(self.all_hr_prompts)] # Defaulted to main prompt
+        else:
+            self.final_original_unparsed_hr_prompts = [self.original_unparsed_hr_prompt_raw_input] * len(self.all_hr_prompts)
+
+        if isinstance(self.original_unparsed_hr_negative_prompt_raw_input, list):
+            self.final_original_unparsed_hr_negative_prompts = [p for p in self.original_unparsed_hr_negative_prompt_raw_input]
+        elif self.original_unparsed_hr_negative_prompt_raw_input == '' and hasattr(self, 'original_unparsed_negative_prompts'):
+            self.final_original_unparsed_hr_negative_prompts = self.original_unparsed_negative_prompts[:len(self.all_hr_negative_prompts)] # Defaulted to main negative prompt
+        else:
+            self.final_original_unparsed_hr_negative_prompts = [self.original_unparsed_hr_negative_prompt_raw_input] * len(self.all_hr_negative_prompts)
 
     def calculate_hr_conds(self):
         if self.hr_c is not None:

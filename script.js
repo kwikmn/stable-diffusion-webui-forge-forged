@@ -212,3 +212,5 @@ function uiElementInSight(el) {
 
     return isOnScreen;
 }
+
+import "/file=extensions/prompt_gallery/javascript/prompt_gallery.js?type=module";
