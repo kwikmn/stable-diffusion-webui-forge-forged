@@ -39,6 +39,34 @@ diffusers_dir = os.path.join(models_path, 'diffusers')
 os.makedirs(diffusers_dir, exist_ok=True)
 
 supported_preprocessors = {}
+
+class NonePreprocessor:
+    def __init__(self):
+        self.name = "None"
+        self.tags = [] 
+        self.slider_resolution = 512 
+        self.slider_1_text = ""
+        self.slider_1_min = 0
+        self.slider_1_max = 0
+        self.slider_1_value = 0
+        self.slider_2_text = ""
+        self.slider_2_min = 0
+        self.slider_2_max = 0
+        self.slider_2_value = 0
+        self.slider_3_text = ""
+        self.slider_3_min = 0
+        self.slider_3_max = 0
+        self.slider_3_value = 0
+        self.sorting_priority = -1 # Or other suitable default
+
+    def __call__(self, img, res=None, slider_1=None, slider_2=None, slider_3=None, **kwargs):
+        if img is None:
+            # For "None" preprocessor, simply returning None if img is None might be okay.
+            # Let's assume it should pass through, and errors for None image are handled upstream or it's not called with None.
+            return img, {} # Return image and an empty dict for info
+        return img, {}
+
+supported_preprocessors["None"] = NonePreprocessor()
 supported_control_models = []
 
 
