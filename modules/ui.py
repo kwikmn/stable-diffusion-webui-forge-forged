@@ -190,22 +190,23 @@ def save_selected_to_gallery_action(selected_image_index:int,gallery_images:list
     original_prompt = getattr(p,'original_prompt_for_gallery',p.prompt); original_negative_prompt = getattr(p,'original_negative_prompt_for_gallery',p.negative_prompt)
     print(f"[PromptGallery] Image URL: {image_url}"); print(f"[PromptGallery] Original Prompt: {original_prompt}"); print(f"[PromptGallery] Original Negative Prompt: {original_negative_prompt}"); print(f"[PromptGallery] Steps: {p.steps}, Seed: {p.seed}, CFG: {p.cfg_scale}")
     feedback_message = f"Image '{os.path.basename(image_url) if image_url else 'selected'}' prepared for gallery (details in console)."; shared.state.textinfo = feedback_message; return gr.update(value=feedback_message)
+
 def create_output_panel(tabname,outdir,toprow=None):
     from modules.ui_common import OutputPanel
     with gr.Column(variant='compact',elem_id=f"{tabname}_results_column"):
         with gr.Row(elem_id=f"{tabname}_gallery_container",variant="compact",elem_classes="output-gallery-container"):
             result_gallery = gr.Gallery(label='Output', show_label=False, elem_id=f"{tabname}_gallery", columns=4,height="auto",preview=True,container=False,object_fit='cover',allow_preview=True) # Applied hardcoded values
         with gr.Row(elem_id=f"{tabname}_tools_row",variant="compact",elem_classes="gradio-compact"):
-            zip_button = ToolButton(value="Zip",elem_id=f'{tabname}_save_zip'); save_button = ToolButton(value="Save",elem_id=f'{tabname}_save')
+            zip_button = ToolButton(value="Zip",elem_id=f'{tabname}_save_zip'); save_button = ToolButton(value="Save",elem_id=f'{tabname}_save') # Hardcoded labels
             save_gallery_button = ToolButton(value='⭐',elem_id=f'{tabname}_save_gallery',tooltip='Save selected image to gallery (saves original prompt and parameters).',visible=True)
-            ui_common.create_output_panel_quick_buttons(tabname,result_gallery)
+            # ui_common.create_output_panel_quick_buttons(tabname,result_gallery) # Removed this line
         generation_info = gr.Textbox(visible=False,elem_id=f'{tabname}_generation_info'); html_log = gr.HTML(elem_id=f'{tabname}_html_log',elem_classes="html-log"); infotext = gr.Textbox(visible=False,elem_id=f'{tabname}_infotext')
         gallery_save_feedback = gr.Textbox(label="Gallery Action Status",visible=True,interactive=False,elem_id=f"{tabname}_gallery_save_feedback",lines=1,max_lines=1)
         save_gallery_button.click(fn=save_selected_to_gallery_action,inputs=[result_gallery.selected_index,result_gallery,last_processed_object_state],outputs=[gallery_save_feedback])
         dummy_component_for_save = gr.Textbox(visible=False,elem_id=f"{tabname}_dummy_component_for_save")
         save_button.click(fn=wrap_gradio_call(ui_common.save_files,extra_outputs=[generation_info,html_log]),_js="gallery_save_files",inputs=[dummy_component_for_save,result_gallery,generation_info,html_log,],outputs=[html_log,],show_progress=False)
         zip_button.click(fn=wrap_gradio_call(ui_common.save_files_zip,extra_outputs=[generation_info,html_log]),_js="gallery_save_files_zip",inputs=[dummy_component_for_save,result_gallery,generation_info,html_log,],outputs=[html_log,],show_progress=False)
-        return OutputPanel(gallery=result_gallery,generation_info=generation_info,infotext=infotext,html_log=html_log,save_button=save_button,zip_button=zip_button,button_upscale=ToolButton(value="Upscale",visible=False),button_live_preview=ToolButton(value="Live Preview",visible=False),button_skip=ToolButton(value='Skip',elem_id=f"{tabname}_skip",visible=False),button_interrupt=ToolButton(value='Interrupt',elem_id=f"{tabname}_interrupt",visible=False),button_stop_generating=ToolButton(value='Stop',elem_id=f"{tabname}_stop_generating",visible=False))
+        return OutputPanel(gallery=result_gallery,generation_info=generation_info,infotext=infotext,html_log=html_log,save_button=save_button,zip_button=zip_button,button_upscale=ToolButton(value="Upscale",visible=False),button_live_preview=ToolButton(value="Live Preview",visible=False),button_skip=ToolButton(value='Skip',elem_id=f"{tabname}_skip",visible=False),button_interrupt=ToolButton(value='Interrupt',elem_id=f"{tabname}_interrupt",visible=False),button_stop_generating=ToolButton(value='Stop',elem_id=f"{tabname}_stop_generating",visible=False)) # Hardcoded labels
 def ordered_ui_categories():
     user_order = {x.strip():i*2+1 for i,x in enumerate(shared.opts.ui_reorder_list)}
     for _,category in sorted(enumerate(shared_items.ui_reorder_categories()),key=lambda x:user_order.get(x[1],x[0]*2+0)): yield category
@@ -268,7 +269,7 @@ def create_ui():
         txt2img_outputs_with_state = [output_panel_txt2img.gallery,output_panel_txt2img.generation_info,output_panel_txt2img.infotext,output_panel_txt2img.html_log,last_processed_object_state]
         txt2img_args = dict(fn=wrap_gradio_gpu_call(txt2img_driver),_js="submit",inputs=txt2img_inputs,outputs=txt2img_outputs_with_state,show_progress=False)
         toprow.prompt.submit(**txt2img_args); toprow.submit.click(**txt2img_args)
-        txt2img_upscale_outputs_with_state = [output_panel_txt2img.gallery,output_panel_txt2img.generation_info,output_panel_txt2img.infotext,output_panel_txt2img.html_log,last_processed_object_state] # Ensure last_processed_object_state is here too
+        txt2img_upscale_outputs_with_state = [output_panel_txt2img.gallery,output_panel_txt2img.generation_info,output_panel_txt2img.infotext,output_panel_txt2img.html_log,last_processed_object_state]
         output_panel_txt2img.button_upscale.click(fn=wrap_gradio_gpu_call(txt2img_upscale_driver), _js="submit_txt2img_upscale", inputs=([dummy_component, output_panel_txt2img.gallery, dummy_component_number, output_panel_txt2img.generation_info] + txt2img_inputs[1:]), outputs=txt2img_upscale_outputs_with_state, show_progress=False)
 
     scripts.scripts_current = scripts.scripts_img2img; scripts.scripts_img2img.initialize_scripts(is_img2img=True)
