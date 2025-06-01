@@ -178,35 +178,33 @@ def apply_setting(key,value):
     opts.data[key] = valtype(value) if valtype!=type(None) else value
     if oldval!=value and opts.data_labels[key].onchange is not None: opts.data_labels[key].onchange()
     opts.save(shared.config_filename); return getattr(opts,key)
-def save_selected_to_gallery_action(selected_image_index:int,gallery_images:list,p_state_data:object):
-    print(f"[PromptGallery] Attempting to save image at index: {selected_image_index}")
-    if gallery_images is None or selected_image_index<0 or selected_image_index>=len(gallery_images): print("[PromptGallery] No image selected or gallery is empty/index out of bounds."); return gr.update(value="Error: No image selected or index out of bounds.")
-    if p_state_data is None: print("[PromptGallery] Error: Processing data (p_state_data) is not available."); return gr.update(value="Error: Original processing data not found.")
-    selected_image_info = gallery_images[selected_image_index]; image_url = selected_image_info.get('name')
-    if not image_url: print("[PromptGallery] Error: Could not get image URL/path from gallery selection."); return gr.update(value="Error: Could not retrieve image path.")
-    from modules.processing import StableDiffusionProcessing
-    p = p_state_data if isinstance(p_state_data,StableDiffusionProcessing) else None
-    if not p: print("[PromptGallery] Error: p_state_data is not a valid StableDiffusionProcessing object."); return gr.update(value="Error: Invalid processing data.")
-    original_prompt = getattr(p,'original_prompt_for_gallery',p.prompt); original_negative_prompt = getattr(p,'original_negative_prompt_for_gallery',p.negative_prompt)
-    print(f"[PromptGallery] Image URL: {image_url}"); print(f"[PromptGallery] Original Prompt: {original_prompt}"); print(f"[PromptGallery] Original Negative Prompt: {original_negative_prompt}"); print(f"[PromptGallery] Steps: {p.steps}, Seed: {p.seed}, CFG: {p.cfg_scale}")
-    feedback_message = f"Image '{os.path.basename(image_url) if image_url else 'selected'}' prepared for gallery (details in console)."; shared.state.textinfo = feedback_message; return gr.update(value=feedback_message)
+
+def save_selected_to_gallery_action(gallery_input_obj, p_state_data_obj, *args):
+    print(f"[GallerySaveTest] Callback triggered. Gallery object: {type(gallery_input_obj)}, P_State object: {type(p_state_data_obj)}")
+    print(f"[GallerySaveTest] Args: {args}")
+    return gr.update(value="Test callback executed.")
 
 def create_output_panel(tabname,outdir,toprow=None):
     from modules.ui_common import OutputPanel
     with gr.Column(variant='compact',elem_id=f"{tabname}_results_column"):
         with gr.Row(elem_id=f"{tabname}_gallery_container",variant="compact",elem_classes="output-gallery-container"):
-            result_gallery = gr.Gallery(label='Output', show_label=False, elem_id=f"{tabname}_gallery", columns=4,height="auto",preview=True,container=False,object_fit='cover',allow_preview=True) # Applied hardcoded values
+            result_gallery = gr.Gallery(label='Output', show_label=False, elem_id=f"{tabname}_gallery", columns=4,height="auto",preview=True,container=False,object_fit='cover',allow_preview=True)
         with gr.Row(elem_id=f"{tabname}_tools_row",variant="compact",elem_classes="gradio-compact"):
-            zip_button = ToolButton(value="Zip",elem_id=f'{tabname}_save_zip'); save_button = ToolButton(value="Save",elem_id=f'{tabname}_save') # Hardcoded labels
+            zip_button = ToolButton(value="Zip",elem_id=f'{tabname}_save_zip'); save_button = ToolButton(value="Save",elem_id=f'{tabname}_save')
             save_gallery_button = ToolButton(value='⭐',elem_id=f'{tabname}_save_gallery',tooltip='Save selected image to gallery (saves original prompt and parameters).',visible=True)
-            # ui_common.create_output_panel_quick_buttons(tabname,result_gallery) # Removed this line
+            # ui_common.create_output_panel_quick_buttons(tabname,result_gallery) # This line is now removed
         generation_info = gr.Textbox(visible=False,elem_id=f'{tabname}_generation_info'); html_log = gr.HTML(elem_id=f'{tabname}_html_log',elem_classes="html-log"); infotext = gr.Textbox(visible=False,elem_id=f'{tabname}_infotext')
         gallery_save_feedback = gr.Textbox(label="Gallery Action Status",visible=True,interactive=False,elem_id=f"{tabname}_gallery_save_feedback",lines=1,max_lines=1)
-        save_gallery_button.click(fn=save_selected_to_gallery_action,inputs=[result_gallery.selected_index,result_gallery,last_processed_object_state],outputs=[gallery_save_feedback])
+
+        save_gallery_button.click(
+            fn=save_selected_to_gallery_action,
+            inputs=[result_gallery, last_processed_object_state], # Modified inputs list
+            outputs=[gallery_save_feedback]
+        )
         dummy_component_for_save = gr.Textbox(visible=False,elem_id=f"{tabname}_dummy_component_for_save")
         save_button.click(fn=wrap_gradio_call(ui_common.save_files,extra_outputs=[generation_info,html_log]),_js="gallery_save_files",inputs=[dummy_component_for_save,result_gallery,generation_info,html_log,],outputs=[html_log,],show_progress=False)
         zip_button.click(fn=wrap_gradio_call(ui_common.save_files_zip,extra_outputs=[generation_info,html_log]),_js="gallery_save_files_zip",inputs=[dummy_component_for_save,result_gallery,generation_info,html_log,],outputs=[html_log,],show_progress=False)
-        return OutputPanel(gallery=result_gallery,generation_info=generation_info,infotext=infotext,html_log=html_log,save_button=save_button,zip_button=zip_button,button_upscale=ToolButton(value="Upscale",visible=False),button_live_preview=ToolButton(value="Live Preview",visible=False),button_skip=ToolButton(value='Skip',elem_id=f"{tabname}_skip",visible=False),button_interrupt=ToolButton(value='Interrupt',elem_id=f"{tabname}_interrupt",visible=False),button_stop_generating=ToolButton(value='Stop',elem_id=f"{tabname}_stop_generating",visible=False)) # Hardcoded labels
+        return OutputPanel(gallery=result_gallery,generation_info=generation_info,infotext=infotext,html_log=html_log,save_button=save_button,zip_button=zip_button,button_upscale=ToolButton(value="Upscale",visible=False),button_live_preview=ToolButton(value="Live Preview",visible=False),button_skip=ToolButton(value='Skip',elem_id=f"{tabname}_skip",visible=False),button_interrupt=ToolButton(value='Interrupt',elem_id=f"{tabname}_interrupt",visible=False),button_stop_generating=ToolButton(value='Stop',elem_id=f"{tabname}_stop_generating",visible=False))
 def ordered_ui_categories():
     user_order = {x.strip():i*2+1 for i,x in enumerate(shared.opts.ui_reorder_list)}
     for _,category in sorted(enumerate(shared_items.ui_reorder_categories()),key=lambda x:user_order.get(x[1],x[0]*2+0)): yield category
@@ -264,7 +262,7 @@ def create_ui():
                                 with FormGroup(elem_id="txt2img_script_container"): custom_inputs = scripts.scripts_txt2img.setup_ui()
                 output_panel_txt2img = create_output_panel("txt2img",opts.outdir_txt2img_samples,toprow)
                 all_target_ui_components_txt2img.extend([field.component for field in parameters_copypaste.txt2img_paste_fields if hasattr(field,'component')])
-                if 'enable_hr' in locals() and enable_hr not in all_target_ui_components_txt2img: all_target_ui_components_txt2img.append(enable_hr) # Ensure enable_hr is captured
+                if 'enable_hr' in locals() and enable_hr not in all_target_ui_components_txt2img: all_target_ui_components_txt2img.append(enable_hr)
         txt2img_inputs = [dummy_component,toprow.prompt,toprow.negative_prompt,toprow.ui_styles.dropdown,batch_count,batch_size,cfg_scale,distilled_cfg_scale,height,width,enable_hr,denoising_strength,hr_scale,hr_upscaler,hr_second_pass_steps,hr_resize_x,hr_resize_y,hr_checkpoint_name,gr.HTML(),hr_sampler_name,hr_scheduler,hr_prompt,hr_negative_prompt,hr_cfg,hr_distilled_cfg,gr.HTML()]+custom_inputs
         txt2img_outputs_with_state = [output_panel_txt2img.gallery,output_panel_txt2img.generation_info,output_panel_txt2img.infotext,output_panel_txt2img.html_log,last_processed_object_state]
         txt2img_args = dict(fn=wrap_gradio_gpu_call(txt2img_driver),_js="submit",inputs=txt2img_inputs,outputs=txt2img_outputs_with_state,show_progress=False)
