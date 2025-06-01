@@ -33,6 +33,9 @@ class Script(scripts.Script):
             return chunk
         
         original_prompt = p.prompt[0] if type(p.prompt) == list else p.prompt
+        # ---> ADD THIS LINE BELOW <-----
+        p.original_prompt_for_gallery = original_prompt
+        # ---> END OF ADDED LINE <-----
         all_prompts = ["".join(replace_wildcard(chunk) for chunk in original_prompt.split("__")) for _ in range(p.batch_size * p.n_iter)]
 
         # TODO: Pregenerate seeds to prevent overlaps when batch_size is > 1
