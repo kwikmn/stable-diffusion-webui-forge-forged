@@ -194,7 +194,7 @@ def create_output_panel(tabname,outdir,toprow=None):
     from modules.ui_common import OutputPanel
     with gr.Column(variant='compact',elem_id=f"{tabname}_results_column"):
         with gr.Row(elem_id=f"{tabname}_gallery_container",variant="compact",elem_classes="output-gallery-container"):
-            result_gallery = gr.Gallery(label='Output',show_label=False,elem_id=f"{tabname}_gallery",columns=4,height="auto",preview=opts.gallery_preview,container=False,object_fit=opts.gallery_image_object_fit,allow_preview=opts.gallery_allow_preview) # Changed opts.samples_columns to 4
+            result_gallery = gr.Gallery(label='Output', show_label=False, elem_id=f"{tabname}_gallery", columns=4,height="auto",preview=True,container=False,object_fit='cover',allow_preview=True) # Applied hardcoded values
         with gr.Row(elem_id=f"{tabname}_tools_row",variant="compact",elem_classes="gradio-compact"):
             zip_button = ToolButton(value=opts.samples_zip_button_label,elem_id=f'{tabname}_save_zip'); save_button = ToolButton(value=opts.samples_save_button_label,elem_id=f'{tabname}_save')
             save_gallery_button = ToolButton(value='⭐',elem_id=f'{tabname}_save_gallery',tooltip='Save selected image to gallery (saves original prompt and parameters).',visible=True)
@@ -277,7 +277,6 @@ def create_ui():
         extra_tabs_img2img = gr.Tabs(elem_id="img2img_extra_tabs",elem_classes=["extra-networks"])
         with extra_tabs_img2img:
             with gr.Tab("Generation",id="img2img_generation") as img2img_generation_tab, ResizeHandleRow(equal_height=False):
-                # Condensed img2img UI components
                 img2img_selected_tab = gr.Number(value=0, visible=False); init_img = ForgeCanvas(); sketch = ForgeCanvas(); init_img_with_mask = ForgeCanvas(); inpaint_color_sketch = ForgeCanvas()
                 init_img_inpaint = gr.Image(); init_mask_inpaint = gr.Image(); mask_blur = gr.Slider(); mask_alpha = gr.Slider(); inpainting_fill = gr.Radio()
                 img2img_denoising_strength = gr.Slider(minimum=0.0,maximum=1.0,step=0.01,label='Denoising strength',value=0.75)
@@ -287,12 +286,9 @@ def create_ui():
                 img2img_override_settings_texts = gr.HTML()
                 img2img_batch_use_png_info = gr.Checkbox(); img2img_batch_png_info_props = gr.CheckboxGroup(); img2img_batch_png_info_dir = gr.Textbox()
                 img2img_batch_source_type = gr.Textbox(); img2img_batch_upload = gr.Files()
-                # Need to define batch_count, batch_size, cfg_scale, distilled_cfg_scale, image_cfg_scale for img2img if they are different from txt2img
-                # For this example, assume they might be reused or new ones defined in a full UI
                 batch_count_img2img = gr.Slider(minimum=1, step=1, label='Batch count', value=1); batch_size_img2img = gr.Slider(minimum=1, maximum=8, step=1, label='Batch size', value=1)
                 cfg_scale_img2img = gr.Slider(minimum=1.0, maximum=30.0, step=0.1, label='CFG Scale', value=7.0); distilled_cfg_scale_img2img = gr.Slider(minimum=0.0, maximum=30.0, step=0.1, label='Distilled CFG Scale', value=3.5)
                 image_cfg_scale_img2img = gr.Slider(minimum=0, maximum=3.0, step=0.05, label='Image CFG Scale', value=1.5)
-
                 img2img_custom_inputs = scripts.scripts_img2img.setup_ui()
                 output_panel_img2img = create_output_panel("img2img",opts.outdir_img2img_samples,toprow_img2img)
                 all_target_ui_components_img2img.extend([field.component for field in parameters_copypaste.img2img_paste_fields if hasattr(field,'component')])
@@ -328,7 +324,7 @@ def create_ui():
         footer = shared.html("footer.html"); footer = footer.format(versions=versions_html(),api_docs="/docs" if shared.cmd_opts.api else "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/API"); gr.HTML(footer,elem_id="footer")
         settings.add_functionality(demo)
         modelmerger_ui.setup_ui(dummy_component=dummy_component if 'dummy_component' in locals() else gr.Textbox(visible=False),sd_model_checkpoint_component=main_entry.ui_checkpoint); main_entry.forge_main_entry()
-    if 'ui_settings_from_file' in locals() and ui_settings_from_file != loadsave.ui_settings: loadsave.dump_defaults() # Check if ui_settings_from_file is defined
+    if 'ui_settings_from_file' in locals() and ui_settings_from_file != loadsave.ui_settings: loadsave.dump_defaults()
     demo.ui_loadsave = loadsave; return demo
 def versions_html():
     import torch,launch; python_version = ".".join([str(x) for x in sys.version_info[0:3]]); commit = launch.commit_hash(); tag = launch.git_tag()
