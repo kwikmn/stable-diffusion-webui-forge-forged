@@ -194,7 +194,7 @@ def create_output_panel(tabname,outdir,toprow=None):
     from modules.ui_common import OutputPanel
     with gr.Column(variant='compact',elem_id=f"{tabname}_results_column"):
         with gr.Row(elem_id=f"{tabname}_gallery_container",variant="compact",elem_classes="output-gallery-container"):
-            result_gallery = gr.Gallery(label='Output',show_label=False,elem_id=f"{tabname}_gallery",columns=opts.samples_columns,height="auto",preview=opts.gallery_preview,container=False,object_fit=opts.gallery_image_object_fit,allow_preview=opts.gallery_allow_preview)
+            result_gallery = gr.Gallery(label='Output',show_label=False,elem_id=f"{tabname}_gallery",columns=4,height="auto",preview=opts.gallery_preview,container=False,object_fit=opts.gallery_image_object_fit,allow_preview=opts.gallery_allow_preview) # Changed opts.samples_columns to 4
         with gr.Row(elem_id=f"{tabname}_tools_row",variant="compact",elem_classes="gradio-compact"):
             zip_button = ToolButton(value=opts.samples_zip_button_label,elem_id=f'{tabname}_save_zip'); save_button = ToolButton(value=opts.samples_save_button_label,elem_id=f'{tabname}_save')
             save_gallery_button = ToolButton(value='⭐',elem_id=f'{tabname}_save_gallery',tooltip='Save selected image to gallery (saves original prompt and parameters).',visible=True)
@@ -223,9 +223,6 @@ def img2img_driver(*args, **kwargs):
     return processed.images + processed.extra_images, processed.js(), plaintext_to_html(processed.info), plaintext_to_html(processed.comments, classname="comments"), p
 
 def txt2img_upscale_driver(*args, **kwargs):
-    # This one doesn't return 'p' in modules/txt2img.py, so we return a dummy None for the 5th output.
-    # Or, modify txt2img_upscale_function to also return 'p' if that state is needed after upscaling.
-    # For now, assume it's not critical for gallery save from an upscale operation's 'p'.
     images, gen_info, html_info, html_log = modules.txt2img.txt2img_upscale(*args, **kwargs)
     return images, gen_info, html_info, html_log, None
 
@@ -241,7 +238,6 @@ def create_ui():
     with gr.Blocks(analytics_enabled=False,head=canvas_head) as txt2img_interface:
         toprow = ui_toprow.Toprow(is_img2img=False,is_compact=shared.opts.compact_prompt_box); toprow_objects["txt2img"] = toprow
         dummy_component = gr.Textbox(visible=False); dummy_component_number = gr.Number(visible=False)
-        # Condensed UI definition for brevity
         extra_tabs = gr.Tabs(elem_id="txt2img_extra_tabs",elem_classes=["extra-networks"])
         with extra_tabs:
             with gr.Tab("Generation",id="txt2img_generation") as txt2img_generation_tab, ResizeHandleRow(equal_height=False):
@@ -267,44 +263,40 @@ def create_ui():
                                 with FormGroup(elem_id="txt2img_script_container"): custom_inputs = scripts.scripts_txt2img.setup_ui()
                 output_panel_txt2img = create_output_panel("txt2img",opts.outdir_txt2img_samples,toprow)
                 all_target_ui_components_txt2img.extend([field.component for field in parameters_copypaste.txt2img_paste_fields if hasattr(field,'component')])
-                if 'enable_hr' in locals() and enable_hr not in all_target_ui_components_txt2img: all_target_ui_components_txt2img.append(enable_hr)
-        txt2img_inputs = [dummy_component,toprow.prompt,toprow.negative_prompt,toprow.ui_styles.dropdown,batch_count,batch_size,cfg_scale,distilled_cfg_scale,height,width,enable_hr,denoising_strength,hr_scale,hr_upscaler,hr_second_pass_steps,hr_resize_x,hr_resize_y,hr_checkpoint_name,gr.HTML(),hr_sampler_name,hr_scheduler,hr_prompt,hr_negative_prompt,hr_cfg,hr_distilled_cfg,gr.HTML()]+custom_inputs # Placeholders for hr_additional_modules, override_settings
+                if 'enable_hr' in locals() and enable_hr not in all_target_ui_components_txt2img: all_target_ui_components_txt2img.append(enable_hr) # Ensure enable_hr is captured
+        txt2img_inputs = [dummy_component,toprow.prompt,toprow.negative_prompt,toprow.ui_styles.dropdown,batch_count,batch_size,cfg_scale,distilled_cfg_scale,height,width,enable_hr,denoising_strength,hr_scale,hr_upscaler,hr_second_pass_steps,hr_resize_x,hr_resize_y,hr_checkpoint_name,gr.HTML(),hr_sampler_name,hr_scheduler,hr_prompt,hr_negative_prompt,hr_cfg,hr_distilled_cfg,gr.HTML()]+custom_inputs
         txt2img_outputs_with_state = [output_panel_txt2img.gallery,output_panel_txt2img.generation_info,output_panel_txt2img.infotext,output_panel_txt2img.html_log,last_processed_object_state]
         txt2img_args = dict(fn=wrap_gradio_gpu_call(txt2img_driver),_js="submit",inputs=txt2img_inputs,outputs=txt2img_outputs_with_state,show_progress=False)
         toprow.prompt.submit(**txt2img_args); toprow.submit.click(**txt2img_args)
-        # Upscale button wiring - assuming txt2img_upscale_driver is defined similar to txt2img_driver
-        txt2img_upscale_outputs_with_state = txt2img_outputs_with_state
-        output_panel_txt2img.button_upscale.click(fn=wrap_gradio_gpu_call(txt2img_upscale_driver), _js="submit_txt2img_upscale", inputs=([dummy_component, output_panel_txt2img.gallery, dummy_component_number, output_panel_txt2img.generation_info] + txt2img_inputs[1:]), outputs=txt2img_upscale_outputs_with_state, show_progress=False) # Simplified inputs for example
+        txt2img_upscale_outputs_with_state = [output_panel_txt2img.gallery,output_panel_txt2img.generation_info,output_panel_txt2img.infotext,output_panel_txt2img.html_log,last_processed_object_state] # Ensure last_processed_object_state is here too
+        output_panel_txt2img.button_upscale.click(fn=wrap_gradio_gpu_call(txt2img_upscale_driver), _js="submit_txt2img_upscale", inputs=([dummy_component, output_panel_txt2img.gallery, dummy_component_number, output_panel_txt2img.generation_info] + txt2img_inputs[1:]), outputs=txt2img_upscale_outputs_with_state, show_progress=False)
 
     scripts.scripts_current = scripts.scripts_img2img; scripts.scripts_img2img.initialize_scripts(is_img2img=True)
     with gr.Blocks(analytics_enabled=False,head=canvas_head) as img2img_interface:
         toprow_img2img = ui_toprow.Toprow(is_img2img=True,is_compact=shared.opts.compact_prompt_box); toprow_objects["img2img"] = toprow_img2img
-        # Condensed UI definition
         extra_tabs_img2img = gr.Tabs(elem_id="img2img_extra_tabs",elem_classes=["extra-networks"])
         with extra_tabs_img2img:
             with gr.Tab("Generation",id="img2img_generation") as img2img_generation_tab, ResizeHandleRow(equal_height=False):
-                # ... (img2img UI components defined here, similar to txt2img, including its own batch_count, batch_size etc.)
-                # For brevity, assuming components like init_img, sketch, etc. are defined.
-                # Need to ensure all inputs for img2img_driver are available.
-                img2img_selected_tab = gr.Number(value=0, visible=False) # Example component
-                init_img = ForgeCanvas(); sketch = ForgeCanvas(); init_img_with_mask = ForgeCanvas(); inpaint_color_sketch = ForgeCanvas() # Placeholders
-                init_img_inpaint = gr.Image(); init_mask_inpaint = gr.Image() # Placeholders
-                mask_blur = gr.Slider(); mask_alpha = gr.Slider(); inpainting_fill = gr.Radio() # Placeholders
-                # img2img specific components like denoising_strength, width, height, cfg_scale, etc. need to be defined for img2img context
-                # For example:
+                # Condensed img2img UI components
+                img2img_selected_tab = gr.Number(value=0, visible=False); init_img = ForgeCanvas(); sketch = ForgeCanvas(); init_img_with_mask = ForgeCanvas(); inpaint_color_sketch = ForgeCanvas()
+                init_img_inpaint = gr.Image(); init_mask_inpaint = gr.Image(); mask_blur = gr.Slider(); mask_alpha = gr.Slider(); inpainting_fill = gr.Radio()
                 img2img_denoising_strength = gr.Slider(minimum=0.0,maximum=1.0,step=0.01,label='Denoising strength',value=0.75)
-                img2img_width = gr.Slider(label="Width"); img2img_height = gr.Slider(label="Height"); img2img_scale_by = gr.Slider(label="Scale by") # Placeholders
-                img2img_resize_mode = gr.Radio(); img2img_inpaint_full_res = gr.Radio(); img2img_inpaint_full_res_padding = gr.Slider(); img2img_inpainting_mask_invert = gr.Radio() # Placeholders
-                img2img_batch_input_dir = gr.Textbox(); img2img_batch_output_dir = gr.Textbox(); img2img_batch_inpaint_mask_dir = gr.Textbox() # Placeholders
-                img2img_override_settings_texts = gr.HTML() # Placeholder for override_settings
-                img2img_batch_use_png_info = gr.Checkbox(); img2img_batch_png_info_props = gr.CheckboxGroup(); img2img_batch_png_info_dir = gr.Textbox() # Placeholders
-                img2img_batch_source_type = gr.Textbox(); img2img_batch_upload = gr.Files() # Placeholders
+                img2img_width = gr.Slider(label="Width"); img2img_height = gr.Slider(label="Height"); img2img_scale_by = gr.Slider(label="Scale by")
+                img2img_resize_mode = gr.Radio(); img2img_inpaint_full_res = gr.Radio(); img2img_inpaint_full_res_padding = gr.Slider(); img2img_inpainting_mask_invert = gr.Radio()
+                img2img_batch_input_dir = gr.Textbox(); img2img_batch_output_dir = gr.Textbox(); img2img_batch_inpaint_mask_dir = gr.Textbox()
+                img2img_override_settings_texts = gr.HTML()
+                img2img_batch_use_png_info = gr.Checkbox(); img2img_batch_png_info_props = gr.CheckboxGroup(); img2img_batch_png_info_dir = gr.Textbox()
+                img2img_batch_source_type = gr.Textbox(); img2img_batch_upload = gr.Files()
+                # Need to define batch_count, batch_size, cfg_scale, distilled_cfg_scale, image_cfg_scale for img2img if they are different from txt2img
+                # For this example, assume they might be reused or new ones defined in a full UI
+                batch_count_img2img = gr.Slider(minimum=1, step=1, label='Batch count', value=1); batch_size_img2img = gr.Slider(minimum=1, maximum=8, step=1, label='Batch size', value=1)
+                cfg_scale_img2img = gr.Slider(minimum=1.0, maximum=30.0, step=0.1, label='CFG Scale', value=7.0); distilled_cfg_scale_img2img = gr.Slider(minimum=0.0, maximum=30.0, step=0.1, label='Distilled CFG Scale', value=3.5)
+                image_cfg_scale_img2img = gr.Slider(minimum=0, maximum=3.0, step=0.05, label='Image CFG Scale', value=1.5)
+
                 img2img_custom_inputs = scripts.scripts_img2img.setup_ui()
-
-
                 output_panel_img2img = create_output_panel("img2img",opts.outdir_img2img_samples,toprow_img2img)
                 all_target_ui_components_img2img.extend([field.component for field in parameters_copypaste.img2img_paste_fields if hasattr(field,'component')])
-        img2img_inputs = [dummy_component,img2img_selected_tab,toprow_img2img.prompt,toprow_img2img.negative_prompt,toprow_img2img.ui_styles.dropdown,init_img.background,sketch.background,sketch.foreground,init_img_with_mask.background,init_img_with_mask.foreground,inpaint_color_sketch.background,inpaint_color_sketch.foreground,init_img_inpaint,init_mask_inpaint,mask_blur,mask_alpha,inpainting_fill,batch_count,batch_size,cfg_scale,distilled_cfg_scale,image_cfg_scale,img2img_denoising_strength,gr.Number(value=0, visible=False),img2img_height,img2img_width,img2img_scale_by,img2img_resize_mode,img2img_inpaint_full_res,img2img_inpaint_full_res_padding,img2img_inpainting_mask_invert,img2img_batch_input_dir,img2img_batch_output_dir,img2img_batch_inpaint_mask_dir,img2img_override_settings_texts,img2img_batch_use_png_info,img2img_batch_png_info_props,img2img_batch_png_info_dir,img2img_batch_source_type,img2img_batch_upload]+img2img_custom_inputs # Placeholders for selected_scale_tab, batch_count, batch_size, cfg_scale, distilled_cfg_scale, image_cfg_scale from img2img context
+        img2img_inputs = [dummy_component,img2img_selected_tab,toprow_img2img.prompt,toprow_img2img.negative_prompt,toprow_img2img.ui_styles.dropdown,init_img.background,sketch.background,sketch.foreground,init_img_with_mask.background,init_img_with_mask.foreground,inpaint_color_sketch.background,inpaint_color_sketch.foreground,init_img_inpaint,init_mask_inpaint,mask_blur,mask_alpha,inpainting_fill,batch_count_img2img,batch_size_img2img,cfg_scale_img2img,distilled_cfg_scale_img2img,image_cfg_scale_img2img,img2img_denoising_strength,gr.Number(value=0, visible=False),img2img_height,img2img_width,img2img_scale_by,img2img_resize_mode,img2img_inpaint_full_res,img2img_inpaint_full_res_padding,img2img_inpainting_mask_invert,img2img_batch_input_dir,img2img_batch_output_dir,img2img_batch_inpaint_mask_dir,img2img_override_settings_texts,img2img_batch_use_png_info,img2img_batch_png_info_props,img2img_batch_png_info_dir,img2img_batch_source_type,img2img_batch_upload]+img2img_custom_inputs
         img2img_outputs_with_state = [output_panel_img2img.gallery,output_panel_img2img.generation_info,output_panel_img2img.infotext,output_panel_img2img.html_log,last_processed_object_state]
         img2img_args = dict(fn=wrap_gradio_gpu_call(img2img_driver),_js="submit_img2img",inputs=img2img_inputs,outputs=img2img_outputs_with_state,show_progress=False)
         toprow_img2img.prompt.submit(**img2img_args); toprow_img2img.submit.click(**img2img_args)
@@ -336,7 +328,7 @@ def create_ui():
         footer = shared.html("footer.html"); footer = footer.format(versions=versions_html(),api_docs="/docs" if shared.cmd_opts.api else "https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/API"); gr.HTML(footer,elem_id="footer")
         settings.add_functionality(demo)
         modelmerger_ui.setup_ui(dummy_component=dummy_component if 'dummy_component' in locals() else gr.Textbox(visible=False),sd_model_checkpoint_component=main_entry.ui_checkpoint); main_entry.forge_main_entry()
-    if 'ui_settings_from_file' in locals() and ui_settings_from_file != loadsave.ui_settings: loadsave.dump_defaults()
+    if 'ui_settings_from_file' in locals() and ui_settings_from_file != loadsave.ui_settings: loadsave.dump_defaults() # Check if ui_settings_from_file is defined
     demo.ui_loadsave = loadsave; return demo
 def versions_html():
     import torch,launch; python_version = ".".join([str(x) for x in sys.version_info[0:3]]); commit = launch.commit_hash(); tag = launch.git_tag()

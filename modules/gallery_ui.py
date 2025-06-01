@@ -163,5 +163,3 @@ def create_gallery_ui():
         # -> JS calls a Python function (which will be get_gallery_parameter_updates) using the new state value.
 
     return gallery_interface
-
-```
