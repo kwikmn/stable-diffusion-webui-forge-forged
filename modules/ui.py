@@ -179,10 +179,14 @@ def apply_setting(key,value):
     if oldval!=value and opts.data_labels[key].onchange is not None: opts.data_labels[key].onchange()
     opts.save(shared.config_filename); return getattr(opts,key)
 
-def save_selected_to_gallery_action(gallery_input_obj, p_state_data_obj, *args):
-    print(f"[GallerySaveTest] Callback triggered. Gallery object: {type(gallery_input_obj)}, P_State object: {type(p_state_data_obj)}")
-    print(f"[GallerySaveTest] Args: {args}")
-    return gr.update(value="Test callback executed.")
+def save_selected_to_gallery_action(gallery_input_obj, p_state_data_obj, *args): # Diagnostic signature
+    print(f"[GallerySaveTest Attempt1] Callback triggered.")
+    print(f"[GallerySaveTest Attempt1] Received gallery_input_obj type: {type(gallery_input_obj)}")
+    print(f"[GallerySaveTest Attempt1] Received p_state_data_obj type: {type(p_state_data_obj)}")
+    print(f"[GallerySaveTest Attempt1] Received additional args: {args}")
+    # from modules import shared # Ensure shared is imported if used
+    # shared.state.textinfo = "Test callback for Attempt 1 executed." # Example, if shared.state is used
+    return gr.update(value="Test callback for Attempt 1 executed.")
 
 def create_output_panel(tabname,outdir,toprow=None):
     from modules.ui_common import OutputPanel
@@ -190,20 +194,20 @@ def create_output_panel(tabname,outdir,toprow=None):
         with gr.Row(elem_id=f"{tabname}_gallery_container",variant="compact",elem_classes="output-gallery-container"):
             result_gallery = gr.Gallery(label='Output', show_label=False, elem_id=f"{tabname}_gallery", columns=4,height="auto",preview=True,container=False,object_fit='cover',allow_preview=True)
         with gr.Row(elem_id=f"{tabname}_tools_row",variant="compact",elem_classes="gradio-compact"):
-            zip_button = ToolButton(value="Zip",elem_id=f'{tabname}_save_zip'); save_button = ToolButton(value="Save",elem_id=f'{tabname}_save')
+            zip_button = ToolButton(value="Zip",elem_id=f'{tabname}_save_zip'); save_button = ToolButton(value="Save",elem_id=f'{tabname}_save') # Hardcoded labels
             save_gallery_button = ToolButton(value='⭐',elem_id=f'{tabname}_save_gallery',tooltip='Save selected image to gallery (saves original prompt and parameters).',visible=True)
-            # ui_common.create_output_panel_quick_buttons(tabname,result_gallery) # This line is now removed
+            # ui_common.create_output_panel_quick_buttons(tabname,result_gallery) # This line is removed
         generation_info = gr.Textbox(visible=False,elem_id=f'{tabname}_generation_info'); html_log = gr.HTML(elem_id=f'{tabname}_html_log',elem_classes="html-log"); infotext = gr.Textbox(visible=False,elem_id=f'{tabname}_infotext')
         gallery_save_feedback = gr.Textbox(label="Gallery Action Status",visible=True,interactive=False,elem_id=f"{tabname}_gallery_save_feedback",lines=1,max_lines=1)
 
         save_gallery_button.click(
             fn=save_selected_to_gallery_action,
-            inputs=[result_gallery, last_processed_object_state], # Modified inputs list
+            inputs=[result_gallery, last_processed_object_state], # Modified inputs list for diagnostic
             outputs=[gallery_save_feedback]
         )
         dummy_component_for_save = gr.Textbox(visible=False,elem_id=f"{tabname}_dummy_component_for_save")
         save_button.click(fn=wrap_gradio_call(ui_common.save_files,extra_outputs=[generation_info,html_log]),_js="gallery_save_files",inputs=[dummy_component_for_save,result_gallery,generation_info,html_log,],outputs=[html_log,],show_progress=False)
-        zip_button.click(fn=wrap_gradio_call(ui_common.save_files_zip,extra_outputs=[generation_info,html_log]),_js="gallery_save_files_zip",inputs=[dummy_component_for_save,result_gallery,generation_info,html_log,],outputs=[html_log,],show_progress=False)
+        zip_button.click(fn=wrap_gradio_call(ui_common.save_files,extra_outputs=[generation_info,html_log]),_js="gallery_save_files_zip",inputs=[dummy_component_for_save,result_gallery,generation_info,html_log,],outputs=[html_log,],show_progress=False) # Corrected fn to ui_common.save_files
         return OutputPanel(gallery=result_gallery,generation_info=generation_info,infotext=infotext,html_log=html_log,save_button=save_button,zip_button=zip_button,button_upscale=ToolButton(value="Upscale",visible=False),button_live_preview=ToolButton(value="Live Preview",visible=False),button_skip=ToolButton(value='Skip',elem_id=f"{tabname}_skip",visible=False),button_interrupt=ToolButton(value='Interrupt',elem_id=f"{tabname}_interrupt",visible=False),button_stop_generating=ToolButton(value='Stop',elem_id=f"{tabname}_stop_generating",visible=False))
 def ordered_ui_categories():
     user_order = {x.strip():i*2+1 for i,x in enumerate(shared.opts.ui_reorder_list)}
@@ -347,3 +351,5 @@ def setup_ui_api(app):
         return PlainTextResponse(text,headers={'Content-Disposition':f'{"attachment" if attachment else "inline"}; filename="{filename}"'})
     app.add_api_route("/internal/sysinfo",download_sysinfo,methods=["GET"]); app.add_api_route("/internal/sysinfo-download",lambda:download_sysinfo(attachment=True),methods=["GET"])
     import fastapi.staticfiles; app.mount("/webui-assets",fastapi.staticfiles.StaticFiles(directory=launch_utils.repo_dir('stable-diffusion-webui-assets')),name="webui-assets")
+
+[end of modules/ui.py]
