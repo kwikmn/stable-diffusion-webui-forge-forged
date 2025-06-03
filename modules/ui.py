@@ -361,6 +361,7 @@ def create_ui():
     scripts.scripts_current = scripts.scripts_img2img; scripts.scripts_img2img.initialize_scripts(is_img2img=True)
     with gr.Blocks(analytics_enabled=False,head=canvas_head) as img2img_interface:
         toprow_img2img = ui_toprow.Toprow(is_img2img=True,is_compact=shared.opts.compact_prompt_box); toprow_objects["img2img"] = toprow_img2img
+        toprow_img2img.create_inline_toprow_prompts()
         extra_tabs_img2img = gr.Tabs(elem_id="img2img_extra_tabs",elem_classes=["extra-networks"])
         with extra_tabs_img2img:
             with gr.Tab("Generation",id="img2img_generation") as img2img_generation_tab, ResizeHandleRow(equal_height=False):
