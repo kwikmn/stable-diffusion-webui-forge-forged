@@ -324,9 +324,16 @@ def forge_main_entry():
         ui_txt2img_hr_distilled_cfg,
     ]
 
-    ui_forge_preset.change(on_preset_change, inputs=[ui_forge_preset], outputs=output_targets, queue=False, show_progress=False)
+    original_output_targets_count = len(output_targets)
+    safe_output_targets = [comp for comp in output_targets if comp is not None and isinstance(comp, gr.components.Component)]
+
+    if len(safe_output_targets) != original_output_targets_count:
+        print(f"[Forge Presets] Warning: Some output targets were None or not valid Gradio components and have been filtered out. Original: {original_output_targets_count}, Safe: {len(safe_output_targets)}")
+        # For debugging, one might print which ones were filtered, but not for production.
+
+    ui_forge_preset.change(on_preset_change, inputs=[ui_forge_preset], outputs=safe_output_targets, queue=False, show_progress=False)
     ui_forge_preset.change(js="clickLoraRefresh", fn=None, queue=False, show_progress=False)
-    Context.root_block.load(on_preset_change, inputs=None, outputs=output_targets, queue=False, show_progress=False)
+    Context.root_block.load(on_preset_change, inputs=None, outputs=safe_output_targets, queue=False, show_progress=False)
 
     refresh_model_loading_parameters()
     return
