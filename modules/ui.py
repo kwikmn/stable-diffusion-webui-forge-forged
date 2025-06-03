@@ -366,6 +366,7 @@ def create_ui():
         with extra_tabs_img2img:
             with gr.Tab("Generation",id="img2img_generation") as img2img_generation_tab, ResizeHandleRow(equal_height=False):
                 img2img_selected_tab = gr.Number(value=0, visible=False); init_img = ForgeCanvas(); sketch = ForgeCanvas(); init_img_with_mask = ForgeCanvas(); inpaint_color_sketch = ForgeCanvas()
+                parameters_copypaste.add_paste_fields("img2img", init_img.background if hasattr(init_img, 'background') and init_img.background is not None else None, [])
                 init_img_inpaint = gr.Image(); init_mask_inpaint = gr.Image(); mask_blur = gr.Slider(); mask_alpha = gr.Slider(); inpainting_fill = gr.Radio()
                 img2img_denoising_strength = gr.Slider(minimum=0.0,maximum=1.0,step=0.01,label='Denoising strength',value=0.75)
                 img2img_width = gr.Slider(label="Width", elem_id="img2img_width"); img2img_height = gr.Slider(label="Height", elem_id="img2img_height"); img2img_scale_by = gr.Slider(label="Scale by")

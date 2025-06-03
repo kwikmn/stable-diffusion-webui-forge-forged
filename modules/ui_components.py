@@ -112,32 +112,50 @@ class InputAccordionImpl(gr.Checkbox):
     @wraps(gr.Checkbox.__init__)
     def __init__(self, value=None, setup=False, **kwargs):
         if not setup:
+            # If not in setup mode, it's just a plain Checkbox, behavior is fine.
+            # However, this path is not taken by InputAccordion() factory.
             super().__init__(value=value, **kwargs)
             return
 
-        self.accordion_id = kwargs.get('elem_id')
-        if self.accordion_id is None:
-            self.accordion_id = f"input-accordion-{InputAccordionImpl.global_index}"
+        # The elem_id passed in kwargs is intended for the logical input component (the Checkbox)
+        checkbox_elem_id = kwargs.get('elem_id')
+        if checkbox_elem_id is None:
+            # Ensure a unique ID if none is provided for the checkbox
+            checkbox_elem_id = f"input-accordion-checkbox-{InputAccordionImpl.global_index}"
+            # We still need a base for the accordion if no elem_id was given at all
+            accordion_base_id = f"input-accordion-{InputAccordionImpl.global_index}"
             InputAccordionImpl.global_index += 1
+        else:
+            # Base the accordion ID on the checkbox ID if an elem_id was provided
+            accordion_base_id = checkbox_elem_id
 
+        # Define a distinct elem_id for the visible gr.Accordion
+        # This makes it unique and identifiable if needed, but not the primary component ID
+        self.visible_accordion_id = f"{accordion_base_id}-accordion-visual"
+
+        # The InputAccordionImpl (self) is the gr.Checkbox.
+        # It gets the primary elem_id passed to InputAccordion().
         kwargs_checkbox = {
-            **kwargs,
-            "elem_id": f"{self.accordion_id}-checkbox",
-            "visible": False,
+            **kwargs, # Original kwargs, including any user-provided elem_id
+            "elem_id": checkbox_elem_id, # Assign the main elem_id here
+            "visible": False, # The checkbox is hidden
         }
         super().__init__(value=value, **kwargs_checkbox)
 
-        self.change(fn=None, _js='function(checked){ inputAccordionChecked("' + self.accordion_id + '", checked); }', inputs=[self])
+        # The JavaScript needs to target the visible accordion by its new, derived ID.
+        self.change(fn=None, _js='function(checked){ inputAccordionChecked("' + self.visible_accordion_id + '", checked); }', inputs=[self])
 
-        kwargs_accordion = {
-            **kwargs,
-            "elem_id": self.accordion_id,
+        # The visible gr.Accordion component.
+        # We remove 'elem_id' from kwargs if it was present to avoid conflicts, then set our derived one.
+        kwargs_for_gr_accordion = {key: value for key, value in kwargs.items() if key != 'elem_id'}
+        kwargs_accordion_final = {
+            **kwargs_for_gr_accordion,
+            "elem_id": self.visible_accordion_id, # Use the derived ID for the visible accordion
             "label": kwargs.get('label', 'Accordion'),
             "elem_classes": ['input-accordion'],
             "open": value,
         }
-
-        self.accordion = gr.Accordion(**kwargs_accordion)
+        self.accordion = gr.Accordion(**kwargs_accordion_final)
 
     def extra(self):
         """Allows you to put something into the label of the accordion.
