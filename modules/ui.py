@@ -351,5 +351,3 @@ def setup_ui_api(app):
         return PlainTextResponse(text,headers={'Content-Disposition':f'{"attachment" if attachment else "inline"}; filename="{filename}"'})
     app.add_api_route("/internal/sysinfo",download_sysinfo,methods=["GET"]); app.add_api_route("/internal/sysinfo-download",lambda:download_sysinfo(attachment=True),methods=["GET"])
     import fastapi.staticfiles; app.mount("/webui-assets",fastapi.staticfiles.StaticFiles(directory=launch_utils.repo_dir('stable-diffusion-webui-assets')),name="webui-assets")
-
-[end of modules/ui.py]
