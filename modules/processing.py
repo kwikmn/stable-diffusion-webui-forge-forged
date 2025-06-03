@@ -210,6 +210,10 @@ class StableDiffusionProcessing:
     sd_vae_name: str = field(default=None, init=False)
     sd_vae_hash: str = field(default=None, init=False)
 
+    # Attributes for Prompt Gallery to store original, unparsed prompts
+    original_prompt_for_gallery: str = field(default=None, init=False)
+    original_negative_prompt_for_gallery: str = field(default=None, init=False)
+
     is_api: bool = field(default=False, init=False)
 
     latents_after_sampling = []
@@ -816,7 +820,7 @@ def process_images(p: StableDiffusionProcessing) -> Processed:
     """applies settings overrides (if any) before processing images, then restores settings as applicable."""
     if p.scripts is not None:
         p.scripts.before_process(p)
-        
+
     stored_opts = {k: opts.data[k] if k in opts.data else opts.get_default(k) for k in p.override_settings.keys() if k in opts.data}
 
     try:

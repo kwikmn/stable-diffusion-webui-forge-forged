@@ -354,6 +354,86 @@ def requirements_met(requirements_file):
     return True
 
 
+def get_a1111_path():
+    """
+    Determines if an existing A1111/Forge installation path should be used or if Forge should run as a fresh install.
+    Reads from/writes to forge_settings.json.
+    """
+    config_filename = Path(script_path) / "forge_settings.json"
+
+    # Try to read existing configuration
+    if config_filename.exists():
+        try:
+            with open(config_filename, "r", encoding="utf-8") as f:
+                config = json.load(f)
+            a1111_path_value = config.get("a1111_path")
+
+            if a1111_path_value == "fresh_install":
+                print("Proceeding with fresh install based on saved configuration.")
+                return None
+            elif isinstance(a1111_path_value, str):
+                potential_path = Path(a1111_path_value)
+                if potential_path.is_dir() and \
+                   ((potential_path / "webui-user.bat").exists() or \
+                    (potential_path / "webui-user.sh").exists() or \
+                    (potential_path / "launch.py").exists()):
+                    print(f"Using existing A1111/Forge installation from saved path: {a1111_path_value}")
+                    return a1111_path_value
+                else:
+                    print(f"Saved path '{a1111_path_value}' is invalid or does not appear to be a valid A1111/Forge installation. Please reconfigure.")
+        except json.JSONDecodeError:
+            print(f"Error decoding JSON from {config_filename}. Please reconfigure.")
+        except IOError:
+            print(f"Error reading {config_filename}. Please reconfigure.")
+
+    # Interactive prompting if no valid config found
+    while True:
+        try:
+            use_existing_input = input("Do you have an existing Stable Diffusion (A1111 or Forge) installation you'd like to use? (yes/no): ").strip().lower()
+            if use_existing_input in ["yes", "y"]:
+                while True:
+                    user_path_input = input("Please enter the full path to the root folder of your existing A1111 or Forge installation (this folder should typically contain subfolders like 'models', 'embeddings', 'outputs'). Leave empty to cancel and proceed with fresh install: ").strip()
+                    if not user_path_input:
+                        print("No path entered. Proceeding with a fresh installation.")
+                        try:
+                            with open(config_filename, "w", encoding="utf-8") as f:
+                                json.dump({"a1111_path": "fresh_install"}, f, indent=4)
+                        except IOError:
+                            print(f"Error saving configuration to {config_filename}.")
+                        return None
+
+                    potential_path = Path(user_path_input)
+                    if potential_path.is_dir() and \
+                       ((potential_path / "webui-user.bat").exists() or \
+                        (potential_path / "webui-user.sh").exists() or \
+                        (potential_path / "launch.py").exists()):
+                        try:
+                            with open(config_filename, "w", encoding="utf-8") as f:
+                                json.dump({"a1111_path": user_path_input}, f, indent=4)
+                            print(f"Successfully saved configuration. Using A1111/Forge installation at: {user_path_input}")
+                            return user_path_input
+                        except IOError:
+                            print(f"Error saving configuration to {config_filename}. Proceeding with entered path but it won't be saved for next time.")
+                            return user_path_input
+                    else:
+                        print("Invalid path. The specified directory does not exist or does not appear to be a valid A1111/Forge installation (missing webui-user.bat/sh or launch.py). Please try again.")
+            elif use_existing_input in ["no", "n"]:
+                print("Proceeding with a fresh installation.")
+                try:
+                    with open(config_filename, "w", encoding="utf-8") as f:
+                        json.dump({"a1111_path": "fresh_install"}, f, indent=4)
+                except IOError:
+                    print(f"Error saving configuration to {config_filename}.")
+                return None
+            else:
+                print("Invalid input. Please answer 'yes' or 'no'.")
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            # Fallback to fresh install in case of unexpected errors during input
+            print("Proceeding with a fresh installation due to an error.")
+            return None
+
+
 def prepare_environment():
     torch_index_url = os.environ.get('TORCH_INDEX_URL', "https://download.pytorch.org/whl/cu121")
     torch_command = os.environ.get('TORCH_COMMAND', f"pip install torch==2.3.1 torchvision==0.18.1 --extra-index-url {torch_index_url}")

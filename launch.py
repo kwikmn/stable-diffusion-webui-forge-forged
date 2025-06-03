@@ -1,6 +1,7 @@
 # import faulthandler
 # faulthandler.enable()
 
+from pathlib import Path # Added this line
 from modules import launch_utils
 
 args = launch_utils.args
@@ -44,8 +45,20 @@ def main():
     if args.test_server:
         configure_for_tests()
 
-    if args.forge_ref_a1111_home:
-        launch_utils.configure_forge_reference_checkout(args.forge_ref_a1111_home)
+    # Configure A1111 reference path - New logic starts here
+    if args.forge_ref_a1111_home and args.forge_ref_a1111_home.strip(): # Check if arg is set and not empty
+        print(f"Using A1111 path from command line argument: {args.forge_ref_a1111_home}")
+        # Ensure args.forge_ref_a1111_home is a Path object before passing
+        launch_utils.configure_forge_reference_checkout(Path(args.forge_ref_a1111_home))
+    else:
+        a1111_path_str = launch_utils.get_a1111_path() # This is from the new function in launch_utils
+        if a1111_path_str:
+            print(f"Using A1111 path from configuration: {a1111_path_str}")
+            launch_utils.configure_forge_reference_checkout(Path(a1111_path_str))
+        else:
+            print("Proceeding with a fresh Forge installation. Default paths will be used.")
+            print("If you intended to use an existing A1111/Forge installation, please restart and choose 'yes' when prompted, or use the --forge-ref-a1111-home command-line argument.")
+    # New logic ends here
 
     start()
 

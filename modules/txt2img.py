@@ -67,17 +67,14 @@ def txt2img_upscale_function(id_task: str, request: gr.Request, gallery, gallery
 
     geninfo = json.loads(generation_info)
 
-    #   catch situation where user tries to hires-fix the grid: probably a mistake, results can be bad aspect ratio - just don't do it
     first_image_index = geninfo.get('index_of_first_image', 0)
-    #   catch if user tries to upscale a control image, this function will fail later trying to get infotext that doesn't exist
-    count_images = len(geninfo.get('infotexts'))        #   note: we have batch_size in geninfo, but not batch_count
+    count_images = len(geninfo.get('infotexts'))
     if len(gallery) > 1 and (gallery_index < first_image_index or gallery_index >= count_images):
         return gallery, generation_info, 'Unable to upscale grid or control images.', ''
 
     p = txt2img_create_processing(id_task, request, *args, force_enable_hr=True)
     p.batch_size = 1
     p.n_iter = 1
-    # txt2img_upscale attribute that signifies this is called by txt2img_upscale
     p.txt2img_upscale = True
 
     image_info = gallery[gallery_index]
@@ -87,64 +84,83 @@ def txt2img_upscale_function(id_task: str, request: gr.Request, gallery, gallery
     p.seed = parameters.get('Seed', -1)
     p.subseed = parameters.get('Variation seed', -1)
 
-    #   update processing width/height based on actual dimensions of source image
     p.width = gallery[gallery_index][0].size[0]
     p.height = gallery[gallery_index][0].size[1]
     p.extra_generation_params['Original Size'] = f'{args[8]}x{args[7]}'
 
     p.override_settings['save_images_before_highres_fix'] = False
 
-    with closing(p):
-        processed = modules.scripts.scripts_txt2img.run(p, *p.script_args)
+    processed_obj = None # Define to ensure it's available in finally
+    try:
+        with closing(p):
+            processed = modules.scripts.scripts_txt2img.run(p, *p.script_args)
 
-        if processed is None:
-            processed = processing.process_images(p)
-
-    shared.total_tqdm.clear()
+            if processed is None:
+                processed = processing.process_images(p)
+        processed_obj = processed
+    finally:
+        # p is closed by with closing(p)
+        shared.total_tqdm.clear()
 
     insert = getattr(shared.opts, 'hires_button_gallery_insert', False)
     new_gallery = []
     for i, image in enumerate(gallery):
         if insert or i != gallery_index:
-            image[0].already_saved_as = image[0].filename.rsplit('?', 1)[0]
+            if hasattr(image[0], 'already_saved_as'): # Check if attribute exists
+                 image[0].already_saved_as = image[0].filename.rsplit('?', 1)[0]
             new_gallery.append(image)
         if i == gallery_index:
-            new_gallery.extend(processed.images)
-        
+            new_gallery.extend(processed_obj.images)
+
     new_index = gallery_index
     if insert:
         new_index += 1
-        geninfo["infotexts"].insert(new_index, processed.info)
+        geninfo["infotexts"].insert(new_index, processed_obj.info)
     else:
-        geninfo["infotexts"][gallery_index] = processed.info
+        geninfo["infotexts"][gallery_index] = processed_obj.info
 
-    return new_gallery, json.dumps(geninfo), plaintext_to_html(processed.info), plaintext_to_html(processed.comments, classname="comments")
+    # For upscale, p is not typically returned to UI state, but if needed, it would be:
+    # return new_gallery, json.dumps(geninfo), plaintext_to_html(processed_obj.info), plaintext_to_html(processed_obj.comments, classname="comments"), p
+    return new_gallery, json.dumps(geninfo), plaintext_to_html(processed_obj.info), plaintext_to_html(processed_obj.comments, classname="comments")
 
 
 def txt2img_function(id_task: str, request: gr.Request, *args):
     p = txt2img_create_processing(id_task, request, *args)
+    processed_obj = None # Define to ensure it's available in finally
 
-    with closing(p):
-        processed = modules.scripts.scripts_txt2img.run(p, *p.script_args)
+    try:
+        with closing(p):
+            processed = modules.scripts.scripts_txt2img.run(p, *p.script_args)
 
-        if processed is None:
-            processed = processing.process_images(p)
+            if processed is None:
+                processed = processing.process_images(p)
+        processed_obj = processed # Assign here to ensure it's the result from process_images
+    finally:
+        # p is closed by with closing(p)
+        shared.total_tqdm.clear()
 
-    shared.total_tqdm.clear()
-
-    generation_info_js = processed.js()
+    generation_info_js = processed_obj.js()
     if opts.samples_log_stdout:
         print(generation_info_js)
 
     if opts.do_not_show_images:
-        processed.images = []
+        processed_obj.images = []
 
-    return processed.images + processed.extra_images, generation_info_js, plaintext_to_html(processed.info), plaintext_to_html(processed.comments, classname="comments")
+    # Return processed_obj for standard outputs, and p for state
+    return processed_obj.images + processed_obj.extra_images, generation_info_js, plaintext_to_html(processed_obj.info), plaintext_to_html(processed_obj.comments, classname="comments"), p
 
 
 def txt2img_upscale(id_task: str, request: gr.Request, gallery, gallery_index, generation_info, *args):
+    # Note: txt2img_upscale_function currently doesn't return p. If it needs to update last_processed_object_state,
+    # its return signature and this call would need modification. For now, assuming only main txt2img/img2img updates the state.
     return main_thread.run_and_wait_result(txt2img_upscale_function, id_task, request, gallery, gallery_index, generation_info, *args)
 
 
 def txt2img(id_task: str, request: gr.Request, *args):
-    return main_thread.run_and_wait_result(txt2img_function, id_task, request, *args)
+    # This will now return a tuple: ( (images, generation_info_js, html_info, html_log), p_object )
+    # The outer tuple is from run_and_wait_result, the inner is from txt2img_function's new return.
+    raw_output = main_thread.run_and_wait_result(txt2img_function, id_task, request, *args)
+    # We need to flatten this for Gradio if wrap_gradio_gpu_call expects flat outputs.
+    # (images, generation_info_js, html_info, html_log), p_object = raw_output
+    # return images, generation_info_js, html_info, html_log, p_object
+    return raw_output # Let wrap_gradio_gpu_call handle the Processed object and p.
