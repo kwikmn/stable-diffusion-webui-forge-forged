@@ -30,6 +30,7 @@ from modules_forge.forge_canvas.canvas import ForgeCanvas, canvas_head
 from modules_forge import main_entry, forge_space
 import modules.processing_scripts.comments as comments
 from modules import gallery_ui # Added for Prompt Gallery tab
+from modules import gallery_saver # Ensure gallery_saver is imported
 
 
 create_setting_component = ui_settings.create_setting_component
@@ -179,14 +180,74 @@ def apply_setting(key,value):
     if oldval!=value and opts.data_labels[key].onchange is not None: opts.data_labels[key].onchange()
     opts.save(shared.config_filename); return getattr(opts,key)
 
-def save_selected_to_gallery_action(gallery_input_obj, p_state_data_obj, *args): # Diagnostic signature
-    print(f"[GallerySaveTest Attempt1] Callback triggered.")
-    print(f"[GallerySaveTest Attempt1] Received gallery_input_obj type: {type(gallery_input_obj)}")
-    print(f"[GallerySaveTest Attempt1] Received p_state_data_obj type: {type(p_state_data_obj)}")
-    print(f"[GallerySaveTest Attempt1] Received additional args: {args}")
-    # from modules import shared # Ensure shared is imported if used
-    # shared.state.textinfo = "Test callback for Attempt 1 executed." # Example, if shared.state is used
-    return gr.update(value="Test callback for Attempt 1 executed.")
+def save_selected_to_gallery_action(gallery_image_data, p_state_data_obj, original_prompt, original_negative_prompt):
+    if gallery_image_data is None:
+        print("[Gallery Save] No image selected in gallery.")
+        return gr.update(value="Error: No image selected from the output gallery.")
+
+    # gallery_image_data can be a list of dicts if multiple images are somehow selected,
+    # or a single dict if only one. We're interested in the primary selected image.
+    # If it's a list, take the first. If it's already a dict, use it.
+    selected_image_info = None
+    if isinstance(gallery_image_data, list) and len(gallery_image_data) > 0:
+        selected_image_info = gallery_image_data[0] # Taking the first image if it's a list
+    elif isinstance(gallery_image_data, dict):
+        selected_image_info = gallery_image_data
+
+    if selected_image_info is None or not isinstance(selected_image_info, dict) or "name" not in selected_image_info:
+        error_msg = f"Error: Could not determine selected image information from gallery. Data: {gallery_image_data}"
+        print(f"[Gallery Save] {error_msg}")
+        # Try to see if it's a direct PIL image (less likely for gr.Gallery input but good to check)
+        if isinstance(gallery_image_data, Image.Image):
+             image_to_save = gallery_image_data
+        else:
+             return gr.update(value=error_msg)
+    else:
+        image_path = selected_image_info.get("name")
+        if not image_path or not os.path.exists(image_path):
+            error_msg = f"Error: Image path not found or invalid in gallery data: {image_path}"
+            print(f"[Gallery Save] {error_msg}")
+            return gr.update(value=error_msg)
+        try:
+            image_to_save = Image.open(image_path)
+        except Exception as e:
+            error_msg = f"Error: Could not open image from path {image_path}: {e}"
+            print(f"[Gallery Save] {error_msg}")
+            return gr.update(value=error_msg)
+
+    if p_state_data_obj is None:
+        print("[Gallery Save] Processing data (p_state_data_obj) is missing.")
+        return gr.update(value="Error: Processing data from the last generation is missing.")
+
+    # p_state_data_obj is the 'p' object (StableDiffusionProcessing instance)
+    # original_prompt and original_negative_prompt are now direct inputs
+
+    if not original_prompt and hasattr(p_state_data_obj, 'prompt'):
+        print("[Gallery Save] Warning: Original prompt text from UI is empty, using p.prompt as fallback.")
+        original_prompt = p_state_data_obj.prompt
+
+    if not original_negative_prompt and hasattr(p_state_data_obj, 'negative_prompt'):
+        # Allow empty negative prompt, but if UI one is empty, use p.negative_prompt if available
+        original_negative_prompt = p_state_data_obj.negative_prompt if p_state_data_obj.negative_prompt else ""
+
+
+    print(f"[Gallery Save] Attempting to save image. Original Prompt: '{original_prompt[:50]}...', NP: '{original_negative_prompt[:50]}...'")
+
+    saved_image_path, saved_json_path = gallery_saver.save_to_gallery(
+        image=image_to_save,
+        p=p_state_data_obj,
+        original_prompt=original_prompt,
+        original_negative_prompt=original_negative_prompt
+    )
+
+    if saved_image_path and saved_json_path:
+        feedback_message = f"Saved to gallery: {os.path.basename(saved_image_path)}"
+        print(f"[Gallery Save] {feedback_message}")
+        return gr.update(value=feedback_message)
+    else:
+        error_msg = "Error: Failed to save to gallery. Check console for details."
+        print(f"[Gallery Save] {error_msg}")
+        return gr.update(value=error_msg)
 
 def create_output_panel(tabname,outdir,toprow=None):
     from modules.ui_common import OutputPanel
@@ -202,13 +263,26 @@ def create_output_panel(tabname,outdir,toprow=None):
 
         save_gallery_button.click(
             fn=save_selected_to_gallery_action,
-            inputs=[result_gallery, last_processed_object_state], # Modified inputs list for diagnostic
+            inputs=[result_gallery, last_processed_object_state, toprow.prompt, toprow.negative_prompt],
             outputs=[gallery_save_feedback]
         )
         dummy_component_for_save = gr.Textbox(visible=False,elem_id=f"{tabname}_dummy_component_for_save")
         save_button.click(fn=wrap_gradio_call(ui_common.save_files,extra_outputs=[generation_info,html_log]),_js="gallery_save_files",inputs=[dummy_component_for_save,result_gallery,generation_info,html_log,],outputs=[html_log,],show_progress=False)
         zip_button.click(fn=wrap_gradio_call(ui_common.save_files,extra_outputs=[generation_info,html_log]),_js="gallery_save_files_zip",inputs=[dummy_component_for_save,result_gallery,generation_info,html_log,],outputs=[html_log,],show_progress=False) # Corrected fn to ui_common.save_files
-        return OutputPanel(gallery=result_gallery,generation_info=generation_info,infotext=infotext,html_log=html_log,save_button=save_button,zip_button=zip_button,button_upscale=ToolButton(value="Upscale",visible=False),button_live_preview=ToolButton(value="Live Preview",visible=False),button_skip=ToolButton(value='Skip',elem_id=f"{tabname}_skip",visible=False),button_interrupt=ToolButton(value='Interrupt',elem_id=f"{tabname}_interrupt",visible=False),button_stop_generating=ToolButton(value='Stop',elem_id=f"{tabname}_stop_generating",visible=False))
+
+        panel = OutputPanel()
+        panel.gallery = result_gallery
+        panel.generation_info = generation_info
+        panel.infotext = infotext
+        panel.html_log = html_log
+        panel.save_button = save_button
+        panel.zip_button = zip_button
+        panel.button_upscale = ToolButton(value="Upscale",visible=False)
+        panel.button_live_preview = ToolButton(value="Live Preview",visible=False)
+        panel.button_skip = ToolButton(value='Skip',elem_id=f"{tabname}_skip",visible=False)
+        panel.button_interrupt = ToolButton(value='Interrupt',elem_id=f"{tabname}_interrupt",visible=False)
+        panel.button_stop_generating = ToolButton(value='Stop',elem_id=f"{tabname}_stop_generating",visible=False)
+        return panel
 def ordered_ui_categories():
     user_order = {x.strip():i*2+1 for i,x in enumerate(shared.opts.ui_reorder_list)}
     for _,category in sorted(enumerate(shared_items.ui_reorder_categories()),key=lambda x:user_order.get(x[1],x[0]*2+0)): yield category

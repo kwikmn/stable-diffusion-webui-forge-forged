@@ -156,6 +156,13 @@ class OutputPanel:
     infotext = None
     html_log = None
     button_upscale = None
+    # Added fields
+    save_button = None
+    zip_button = None
+    button_live_preview = None
+    button_skip = None
+    button_interrupt = None
+    button_stop_generating = None
 
 
 def create_output_panel(tabname, outdir, toprow=None):
