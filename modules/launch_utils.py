@@ -476,6 +476,88 @@ def prepare_environment():
         exit(0)
 
 
+def get_a1111_path():
+    config_filename = Path(script_path) / "forge_settings.json"
+
+    # Helper to save config
+    def _save_config(data_to_save):
+        try:
+            with open(config_filename, "w", encoding="utf-8") as f:
+                json.dump(data_to_save, f, indent=4)
+            print(f"Configuration saved to {config_filename}")
+            return True
+        except IOError as e:
+            print(f"Error saving configuration to {config_filename}: {e}. Please check file permissions.")
+            return False
+
+    # 1. Reading existing configuration
+    try:
+        if config_filename.exists():
+            with open(config_filename, "r", encoding="utf-8") as f:
+                config = json.load(f)
+                a1111_path_value = config.get("a1111_path")
+
+                if a1111_path_value == "fresh_install":
+                    print("Proceeding with fresh install based on saved configuration.")
+                    return None
+
+                if isinstance(a1111_path_value, str) and a1111_path_value:
+                    path_obj = Path(a1111_path_value)
+                    # Basic check, can be expanded with webui-user.bat etc.
+                    if path_obj.is_dir() and ( (path_obj / "webui-user.bat").exists() or \
+                                               (path_obj / "webui-user.sh").exists() or \
+                                               (path_obj / "launch.py").exists() ): # Check for common A1111/Forge files
+                        print(f"Using existing A1111 installation from saved path: {a1111_path_value}")
+                        return a1111_path_value
+                    else:
+                        print(f"Saved path '{a1111_path_value}' is invalid or not found. Re-configuring...")
+                        # Proceed to interactive prompting by falling through
+                # If path is empty or not a string (but not "fresh_install"), also fall through
+                elif a1111_path_value is not None and a1111_path_value != "": # handles cases like empty string or other non-string non-None types
+                     print(f"Saved path configuration '{a1111_path_value}' is not valid. Re-configuring...")
+
+
+    except json.JSONDecodeError:
+        print(f"Error decoding {config_filename}. File might be corrupt. Will ask for configuration.")
+    except IOError as e:
+        print(f"Error reading {config_filename}: {e}. Will ask for configuration.")
+
+    # 2. Interactive prompting if no valid existing configuration
+    while True:
+        has_existing_install_choice = input("Do you have an existing Stable Diffusion (A1111 or Forge) installation you'd like to use? (yes/no): ").strip().lower()
+        if has_existing_install_choice in ["yes", "y"]:
+            while True:
+                user_path_input = input("Please enter the full path to the root folder of your existing A1111 or Forge installation (this folder should typically contain subfolders like 'models', 'embeddings', 'outputs'). Leave empty to cancel and proceed with fresh install: ").strip()
+                if not user_path_input:
+                    print("No path entered. Proceeding with a fresh installation.")
+                    _save_config({"a1111_path": "fresh_install"})
+                    return None
+
+                user_path_obj = Path(user_path_input)
+                if user_path_obj.is_dir() and \
+                   ((user_path_obj / "webui-user.bat").exists() or \
+                    (user_path_obj / "webui-user.sh").exists() or \
+                    (user_path_obj / "launch.py").exists()): # More specific check
+                    if _save_config({"a1111_path": user_path_input}):
+                        print(f"Using existing installation at: {user_path_input}")
+                        return user_path_input
+                    else:
+                        # Failed to save, but path is valid. Proceed without saving or ask again?
+                        # For now, let's return the path as it's valid, but config is not saved.
+                        print(f"Warning: Could not save path to {config_filename}. Proceeding with {user_path_input} for this session.")
+                        return user_path_input
+                else:
+                    print("Invalid path. Please ensure it's a valid A1111 or Forge installation directory (e.g., contains webui-user.bat/sh or launch.py).")
+            # This break is technically unreachable due to returns in inner loop, but good for logical flow.
+            # break
+        elif has_existing_install_choice in ["no", "n"]:
+            print("Proceeding with a fresh installation.")
+            _save_config({"a1111_path": "fresh_install"})
+            return None
+        else:
+            print("Invalid input. Please answer 'yes' or 'no'.")
+
+
 def configure_for_tests():
     if "--api" not in sys.argv:
         sys.argv.append("--api")
