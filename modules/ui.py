@@ -324,6 +324,7 @@ def create_ui():
 
     with gr.Blocks(analytics_enabled=False,head=canvas_head) as txt2img_interface:
         toprow = ui_toprow.Toprow(is_img2img=False,is_compact=shared.opts.compact_prompt_box); toprow_objects["txt2img"] = toprow
+        parameters_copypaste.add_paste_fields("txt2img", None, [])
         dummy_component = gr.Textbox(visible=False); dummy_component_number = gr.Number(visible=False)
         extra_tabs = gr.Tabs(elem_id="txt2img_extra_tabs",elem_classes=["extra-networks"])
         with extra_tabs:
