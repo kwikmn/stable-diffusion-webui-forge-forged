@@ -339,7 +339,7 @@ def create_ui():
                             elif category=="scripts":
                                 with FormGroup(elem_id="txt2img_script_container"): custom_inputs = scripts.scripts_txt2img.setup_ui()
                 output_panel_txt2img = create_output_panel("txt2img",opts.outdir_txt2img_samples,toprow)
-                all_target_ui_components_txt2img.extend([field.component for field in parameters_copypaste.txt2img_paste_fields if hasattr(field,'component')])
+                all_target_ui_components_txt2img.extend([field.component for field in txt2img_paste_fields if hasattr(field,'component')])
                 if 'enable_hr' in locals() and enable_hr not in all_target_ui_components_txt2img: all_target_ui_components_txt2img.append(enable_hr)
         txt2img_inputs = [dummy_component,toprow.prompt,toprow.negative_prompt,toprow.ui_styles.dropdown,batch_count,batch_size,cfg_scale,distilled_cfg_scale,height,width,enable_hr,denoising_strength,hr_scale,hr_upscaler,hr_second_pass_steps,hr_resize_x,hr_resize_y,hr_checkpoint_name,gr.HTML(),hr_sampler_name,hr_scheduler,hr_prompt,hr_negative_prompt,hr_cfg,hr_distilled_cfg,gr.HTML()]+custom_inputs
         txt2img_outputs_with_state = [output_panel_txt2img.gallery,output_panel_txt2img.generation_info,output_panel_txt2img.infotext,output_panel_txt2img.html_log,last_processed_object_state]
@@ -368,7 +368,7 @@ def create_ui():
                 image_cfg_scale_img2img = gr.Slider(minimum=0, maximum=3.0, step=0.05, label='Image CFG Scale', value=1.5)
                 img2img_custom_inputs = scripts.scripts_img2img.setup_ui()
                 output_panel_img2img = create_output_panel("img2img",opts.outdir_img2img_samples,toprow_img2img)
-                all_target_ui_components_img2img.extend([field.component for field in parameters_copypaste.img2img_paste_fields if hasattr(field,'component')])
+                all_target_ui_components_img2img.extend([field.component for field in img2img_paste_fields if hasattr(field,'component')])
         img2img_inputs = [dummy_component,img2img_selected_tab,toprow_img2img.prompt,toprow_img2img.negative_prompt,toprow_img2img.ui_styles.dropdown,init_img.background,sketch.background,sketch.foreground,init_img_with_mask.background,init_img_with_mask.foreground,inpaint_color_sketch.background,inpaint_color_sketch.foreground,init_img_inpaint,init_mask_inpaint,mask_blur,mask_alpha,inpainting_fill,batch_count_img2img,batch_size_img2img,cfg_scale_img2img,distilled_cfg_scale_img2img,image_cfg_scale_img2img,img2img_denoising_strength,gr.Number(value=0, visible=False),img2img_height,img2img_width,img2img_scale_by,img2img_resize_mode,img2img_inpaint_full_res,img2img_inpaint_full_res_padding,img2img_inpainting_mask_invert,img2img_batch_input_dir,img2img_batch_output_dir,img2img_batch_inpaint_mask_dir,img2img_override_settings_texts,img2img_batch_use_png_info,img2img_batch_png_info_props,img2img_batch_png_info_dir,img2img_batch_source_type,img2img_batch_upload]+img2img_custom_inputs
         img2img_outputs_with_state = [output_panel_img2img.gallery,output_panel_img2img.generation_info,output_panel_img2img.infotext,output_panel_img2img.html_log,last_processed_object_state]
         img2img_args = dict(fn=wrap_gradio_gpu_call(img2img_driver),_js="submit_img2img",inputs=img2img_inputs,outputs=img2img_outputs_with_state,show_progress=False)
