@@ -32,6 +32,8 @@ import modules.processing_scripts.comments as comments
 from modules import gallery_ui # Added for Prompt Gallery tab
 from modules import gallery_saver # Ensure gallery_saver is imported
 
+txt2img_paste_fields = []
+img2img_paste_fields = []
 
 create_setting_component = ui_settings.create_setting_component
 
