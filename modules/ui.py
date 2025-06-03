@@ -263,11 +263,19 @@ def create_output_panel(tabname,outdir,toprow=None):
         generation_info = gr.Textbox(visible=False,elem_id=f'{tabname}_generation_info'); html_log = gr.HTML(elem_id=f'{tabname}_html_log',elem_classes="html-log"); infotext = gr.Textbox(visible=False,elem_id=f'{tabname}_infotext')
         gallery_save_feedback = gr.Textbox(label="Gallery Action Status",visible=True,interactive=False,elem_id=f"{tabname}_gallery_save_feedback",lines=1,max_lines=1)
 
-        save_gallery_button.click(
-            fn=save_selected_to_gallery_action,
-            inputs=[result_gallery, last_processed_object_state, toprow.prompt, toprow.negative_prompt],
-            outputs=[gallery_save_feedback]
-        )
+        if toprow and hasattr(toprow, 'prompt') and isinstance(toprow.prompt, gr.components.Component) and            hasattr(toprow, 'negative_prompt') and isinstance(toprow.negative_prompt, gr.components.Component):
+            save_gallery_button.click(
+                fn=save_selected_to_gallery_action,
+                inputs=[result_gallery, last_processed_object_state, toprow.prompt, toprow.negative_prompt],
+                outputs=[gallery_save_feedback]
+            )
+        else:
+            print(f"[UI Setup] Warning: Prompt or Negative Prompt component is not available for tab '{tabname}' in the current 'toprow' configuration. 'Save to Gallery' button functionality might be limited or disabled for this tab.")
+            # Optionally, you could make the button non-interactive if the components are missing:
+            # save_gallery_button.interactive = False
+            # Or even hide it, though it's created visible by default:
+            # save_gallery_button.visible = False
+            # For now, just printing a warning is the safest change.
         dummy_component_for_save = gr.Textbox(visible=False,elem_id=f"{tabname}_dummy_component_for_save")
         save_button.click(fn=wrap_gradio_call(ui_common.save_files,extra_outputs=[generation_info,html_log]),_js="gallery_save_files",inputs=[dummy_component_for_save,result_gallery,generation_info,html_log,],outputs=[html_log,],show_progress=False)
         zip_button.click(fn=wrap_gradio_call(ui_common.save_files,extra_outputs=[generation_info,html_log]),_js="gallery_save_files_zip",inputs=[dummy_component_for_save,result_gallery,generation_info,html_log,],outputs=[html_log,],show_progress=False) # Corrected fn to ui_common.save_files
