@@ -32,10 +32,13 @@ class Script(scripts.Script):
                         return random.choice(f.read().splitlines())
             return chunk
         
-        original_prompt = p.prompt[0] if type(p.prompt) == list else p.prompt
-        # ---> ADD THIS LINE BELOW <-----
+        original_prompt = p.prompt[0] if isinstance(p.prompt, list) else p.prompt
         p.original_prompt_for_gallery = original_prompt
-        # ---> END OF ADDED LINE <-----
+
+        original_negative_prompt = (
+            p.negative_prompt[0] if isinstance(p.negative_prompt, list) else p.negative_prompt
+        )
+        p.original_negative_prompt_for_gallery = original_negative_prompt
         all_prompts = ["".join(replace_wildcard(chunk) for chunk in original_prompt.split("__")) for _ in range(p.batch_size * p.n_iter)]
 
         # TODO: Pregenerate seeds to prevent overlaps when batch_size is > 1
