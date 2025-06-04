@@ -179,14 +179,36 @@ def apply_setting(key,value):
     if oldval!=value and opts.data_labels[key].onchange is not None: opts.data_labels[key].onchange()
     opts.save(shared.config_filename); return getattr(opts,key)
 
-def save_selected_to_gallery_action(gallery_input_obj, p_state_data_obj, *args): # Diagnostic signature
-    print(f"[GallerySaveTest Attempt1] Callback triggered.")
-    print(f"[GallerySaveTest Attempt1] Received gallery_input_obj type: {type(gallery_input_obj)}")
-    print(f"[GallerySaveTest Attempt1] Received p_state_data_obj type: {type(p_state_data_obj)}")
-    print(f"[GallerySaveTest Attempt1] Received additional args: {args}")
-    # from modules import shared # Ensure shared is imported if used
-    # shared.state.textinfo = "Test callback for Attempt 1 executed." # Example, if shared.state is used
-    return gr.update(value="Test callback for Attempt 1 executed.")
+def save_selected_to_gallery_action(gallery_input_obj, p_state_data_obj, selected_index=0):
+    """Save the chosen image along with original prompts/settings to the gallery."""
+    from modules import gallery_saver
+
+    if not gallery_input_obj:
+        return gr.update(value="No images to save.")
+
+    try:
+        index = int(selected_index)
+    except Exception:
+        index = 0
+
+    if index < 0 or index >= len(gallery_input_obj):
+        index = 0
+
+    image = gallery_input_obj[index]
+    p = p_state_data_obj
+
+    if p is None:
+        return gr.update(value="Generation data missing.")
+
+    prompt = getattr(p, "original_prompt_for_gallery", "")
+    neg_prompt = getattr(p, "original_negative_prompt_for_gallery", "")
+
+    image_path, json_path = gallery_saver.save_to_gallery(image, p, prompt, neg_prompt)
+
+    if image_path:
+        return gr.update(value=f"Saved to gallery: {os.path.basename(image_path)}")
+    else:
+        return gr.update(value="Failed to save to gallery.")
 
 def create_output_panel(tabname,outdir,toprow=None):
     from modules.ui_common import OutputPanel
@@ -202,8 +224,9 @@ def create_output_panel(tabname,outdir,toprow=None):
 
         save_gallery_button.click(
             fn=save_selected_to_gallery_action,
-            inputs=[result_gallery, last_processed_object_state], # Modified inputs list for diagnostic
-            outputs=[gallery_save_feedback]
+            inputs=[result_gallery, last_processed_object_state, save_gallery_button],
+            outputs=[gallery_save_feedback],
+            _js="(gal, p, btn) => [gal, p, selected_gallery_index()]"
         )
         dummy_component_for_save = gr.Textbox(visible=False,elem_id=f"{tabname}_dummy_component_for_save")
         save_button.click(fn=wrap_gradio_call(ui_common.save_files,extra_outputs=[generation_info,html_log]),_js="gallery_save_files",inputs=[dummy_component_for_save,result_gallery,generation_info,html_log,],outputs=[html_log,],show_progress=False)

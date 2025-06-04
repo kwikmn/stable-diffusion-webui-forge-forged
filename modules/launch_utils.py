@@ -321,7 +321,7 @@ re_requirement = re.compile(r"\s*([-_a-zA-Z0-9]+)\s*(?:==\s*([-+_.a-zA-Z0-9]+))?
 
 def requirements_met(requirements_file):
     """
-    Does a simple parse of a requirements.txt file to determine if all rerqirements in it
+    Does a simple parse of a requirements.txt file to determine if all requirements in it
     are already installed. Returns True if so, False if not installed or parsing fails.
     """
 
