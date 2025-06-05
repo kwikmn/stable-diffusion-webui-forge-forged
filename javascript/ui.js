@@ -440,3 +440,11 @@ function onEdit(editId, elem, afterMs, func) {
 
     return edited;
 }
+
+function gallery_save_files(js_data, images, gen_info, html_log) {
+    return [js_data, images, gen_info, html_log, false, selected_gallery_index()];
+}
+
+function gallery_save_files_zip(js_data, images, gen_info, html_log) {
+    return [js_data, images, gen_info, html_log, true, selected_gallery_index()];
+}

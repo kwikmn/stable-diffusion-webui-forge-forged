@@ -7,6 +7,76 @@ import os
 # This might be better placed in a shared context or ui.py if accessed by many places
 current_gallery_selected_params = gr.State(None)
 
+def get_gallery_parameter_updates(loaded_params_dict):
+    """Convert stored gallery parameters into values usable by the UI."""
+    if not loaded_params_dict or not loaded_params_dict.get("_gallery_params_loaded"):
+        return {"error": "No parameters loaded or invalid data"}
+
+    infotext_like_params = {
+        "Prompt": loaded_params_dict.get("original_prompt"),
+        "Negative prompt": loaded_params_dict.get("original_negative_prompt"),
+        "Steps": loaded_params_dict.get("steps"),
+        "Sampler": loaded_params_dict.get("sampler_name"),
+        "Schedule type": loaded_params_dict.get("scheduler"),
+        "CFG scale": loaded_params_dict.get("cfg_scale"),
+        "Seed": loaded_params_dict.get("seed"),
+        "Size-1": loaded_params_dict.get("width"),
+        "Size-2": loaded_params_dict.get("height"),
+        "Model hash": loaded_params_dict.get("model_hash"),
+        "Model": loaded_params_dict.get("model_name"),
+        "VAE": loaded_params_dict.get("sd_vae_name"),
+        "Denoising strength": loaded_params_dict.get("denoising_strength"),
+        "Variation seed": loaded_params_dict.get("subseed"),
+        "Variation seed strength": loaded_params_dict.get("subseed_strength"),
+        "Seed resize from-1": loaded_params_dict.get("seed_resize_from_w"),
+        "Seed resize from-2": loaded_params_dict.get("seed_resize_from_h"),
+        "Clip skip": loaded_params_dict.get("clip_skip"),
+        "Face restoration": loaded_params_dict.get("face_restoration"),
+        "Tiling": loaded_params_dict.get("tiling"),
+        "Image CFG scale": loaded_params_dict.get("image_cfg_scale"),
+        "Mask blur": loaded_params_dict.get("mask_blur"),
+    }
+
+    masked_content_val = loaded_params_dict.get("inpainting_fill")
+    if masked_content_val == 0:
+        infotext_like_params["Masked content"] = "fill"
+    elif masked_content_val == 1:
+        infotext_like_params["Masked content"] = "original"
+    elif masked_content_val == 2:
+        infotext_like_params["Masked content"] = "latent noise"
+    elif masked_content_val == 3:
+        infotext_like_params["Masked content"] = "latent nothing"
+
+    inpaint_area_val = loaded_params_dict.get("inpaint_full_res")
+    infotext_like_params["Inpaint area"] = "Whole picture" if inpaint_area_val == 0 else "Only masked"
+    infotext_like_params["Masked area padding"] = loaded_params_dict.get("inpaint_full_res_padding")
+    infotext_like_params["Mask mode"] = (
+        "Inpaint masked" if loaded_params_dict.get("inpainting_mask_invert") == 0 else "Inpaint not masked"
+    )
+
+    if loaded_params_dict.get("enable_hr", False):
+        infotext_like_params.update({
+            "Hires upscale": loaded_params_dict.get("hr_scale"),
+            "Hires upscaler": loaded_params_dict.get("hr_upscaler"),
+            "Hires steps": loaded_params_dict.get("hr_second_pass_steps"),
+            "Hires resize-1": loaded_params_dict.get("hr_resize_x"),
+            "Hires resize-2": loaded_params_dict.get("hr_resize_y"),
+            "Hires prompt": loaded_params_dict.get("hr_prompt"),
+            "Hires negative prompt": loaded_params_dict.get("hr_negative_prompt"),
+            "Hires checkpoint": loaded_params_dict.get("hr_checkpoint_name"),
+            "Hires sampler": loaded_params_dict.get("hr_sampler_name"),
+            "Hires schedule type": loaded_params_dict.get("hr_scheduler"),
+            "Hires CFG Scale": loaded_params_dict.get("hr_cfg"),
+            "Hires Distilled CFG Scale": loaded_params_dict.get("hr_distilled_cfg"),
+            "Denoising strength": loaded_params_dict.get("denoising_strength"),
+        })
+
+    extra = loaded_params_dict.get("extra_generation_params")
+    if isinstance(extra, dict):
+        infotext_like_params.update(extra)
+
+    return infotext_like_params
+
 def create_gallery_ui():
     with gr.Blocks() as gallery_interface:
         gr.HTML("<p style='text-align:center;'>Browse saved prompts and their generated images. Click an image to load its parameters.</p>")
@@ -78,75 +148,6 @@ def create_gallery_ui():
             params["_gallery_params_loaded"] = True # Add a flag for JS to check
             return params # This will be sent back to the JS that called this gr.Button.click via current_gallery_selected_params
 
-        # This is the Python function that JS will call to get all the gr.Update objects
-        # This function is NOT directly called by a Gradio component event in this file.
-        # It's intended to be called by an API endpoint or a JS-triggered Python call.
-        # For now, it's defined here but will be wired up in ui.py or via an API.
-        def get_gallery_parameter_updates(loaded_params_dict):
-            if not loaded_params_dict or not loaded_params_dict.get("_gallery_params_loaded"):
-                return { "error": "No parameters loaded or invalid data" }
-
-            infotext_like_params = {}
-            infotext_like_params["Prompt"] = loaded_params_dict.get('original_prompt')
-            infotext_like_params["Negative prompt"] = loaded_params_dict.get('original_negative_prompt')
-            infotext_like_params["Steps"] = loaded_params_dict.get('steps')
-            infotext_like_params["Sampler"] = loaded_params_dict.get('sampler_name')
-            infotext_like_params["Schedule type"] = loaded_params_dict.get('scheduler')
-            infotext_like_params["CFG scale"] = loaded_params_dict.get('cfg_scale')
-            infotext_like_params["Seed"] = loaded_params_dict.get('seed')
-            infotext_like_params["Size-1"] = loaded_params_dict.get('width')
-            infotext_like_params["Size-2"] = loaded_params_dict.get('height')
-            infotext_like_params["Model hash"] = loaded_params_dict.get('model_hash')
-            infotext_like_params["Model"] = loaded_params_dict.get('model_name')
-            infotext_like_params["VAE"] = loaded_params_dict.get('sd_vae_name')
-            infotext_like_params["Denoising strength"] = loaded_params_dict.get('denoising_strength')
-            infotext_like_params["Variation seed"] = loaded_params_dict.get('subseed')
-            infotext_like_params["Variation seed strength"] = loaded_params_dict.get('subseed_strength')
-            infotext_like_params["Seed resize from-1"] = loaded_params_dict.get('seed_resize_from_w')
-            infotext_like_params["Seed resize from-2"] = loaded_params_dict.get('seed_resize_from_h')
-            infotext_like_params["Clip skip"] = loaded_params_dict.get('clip_skip')
-            infotext_like_params["Face restoration"] = loaded_params_dict.get('face_restoration')
-            infotext_like_params["Tiling"] = loaded_params_dict.get('tiling')
-            infotext_like_params["Image CFG scale"] = loaded_params_dict.get('image_cfg_scale')
-            infotext_like_params["Mask blur"] = loaded_params_dict.get('mask_blur')
-            # Mapping based on create_infotext, where inpainting_fill is stored as "Masked content"
-            masked_content_val = loaded_params_dict.get('inpainting_fill')
-            if masked_content_val == 0: infotext_like_params["Masked content"] = 'fill'
-            elif masked_content_val == 1: infotext_like_params["Masked content"] = 'original'
-            elif masked_content_val == 2: infotext_like_params["Masked content"] = 'latent noise'
-            elif masked_content_val == 3: infotext_like_params["Masked content"] = 'latent nothing'
-
-            inpaint_area_val = loaded_params_dict.get('inpaint_full_res') # This is 0 for "Whole picture", 1 for "Only masked"
-            infotext_like_params["Inpaint area"] = "Whole picture" if inpaint_area_val == 0 else "Only masked"
-
-            infotext_like_params["Masked area padding"] = loaded_params_dict.get('inpaint_full_res_padding')
-            # Mapping for inpainting_mask_invert (0: Inpaint masked, 1: Inpaint not masked)
-            infotext_like_params["Mask mode"] = "Inpaint masked" if loaded_params_dict.get('inpainting_mask_invert') == 0 else "Inpaint not masked"
-
-
-            if loaded_params_dict.get('enable_hr', False):
-                infotext_like_params["Hires upscale"] = loaded_params_dict.get('hr_scale')
-                infotext_like_params["Hires upscaler"] = loaded_params_dict.get('hr_upscaler')
-                infotext_like_params["Hires steps"] = loaded_params_dict.get('hr_second_pass_steps')
-                infotext_like_params["Hires resize-1"] = loaded_params_dict.get('hr_resize_x')
-                infotext_like_params["Hires resize-2"] = loaded_params_dict.get('hr_resize_y')
-                infotext_like_params["Hires prompt"] = loaded_params_dict.get('hr_prompt')
-                infotext_like_params["Hires negative prompt"] = loaded_params_dict.get('hr_negative_prompt')
-                infotext_like_params["Hires checkpoint"] = loaded_params_dict.get('hr_checkpoint_name')
-                infotext_like_params["Hires sampler"] = loaded_params_dict.get('hr_sampler_name')
-                infotext_like_params["Hires schedule type"] = loaded_params_dict.get('hr_scheduler')
-                infotext_like_params["Hires CFG Scale"] = loaded_params_dict.get('hr_cfg')
-                infotext_like_params["Hires Distilled CFG Scale"] = loaded_params_dict.get('hr_distilled_cfg')
-                # Denoising strength is often part of Hires fix section in UI, ensure it's included
-                infotext_like_params["Denoising strength"] = loaded_params_dict.get('denoising_strength')
-
-
-            if 'extra_generation_params' in loaded_params_dict and isinstance(loaded_params_dict['extra_generation_params'], dict):
-                for k,v in loaded_params_dict['extra_generation_params'].items():
-                    infotext_like_params[k] = v
-
-            return infotext_like_params
-
         load_params_button.click(
             fn=load_parameters_from_gallery,
             inputs=[item_to_load_json_path],
@@ -161,5 +162,7 @@ def create_gallery_ui():
         # The mechanism is: JS clicks load_params_button -> load_parameters_from_gallery runs, updates current_gallery_selected_params
         # -> JS sees current_gallery_selected_params changed (how? via another click or observing state change)
         # -> JS calls a Python function (which will be get_gallery_parameter_updates) using the new state value.
+
+        gallery_interface.apply_gallery_params_to_ui_button = apply_gallery_params_to_ui_button
 
     return gallery_interface

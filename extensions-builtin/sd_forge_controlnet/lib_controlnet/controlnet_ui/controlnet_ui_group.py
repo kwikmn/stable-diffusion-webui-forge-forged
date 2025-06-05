@@ -955,6 +955,8 @@ class ControlNetUiGroup(object):
             ControlNetUiGroup.global_batch_input_dir,
             ControlNetUiGroup.a1111_context.img2img_batch_input_dir,
         ]
+        batch_dirs = [d for d in batch_dirs if d is not None]
+
         for batch_dir_comp in batch_dirs:
             subscriber = getattr(batch_dir_comp, "blur", None)
             if subscriber is None:
@@ -966,12 +968,14 @@ class ControlNetUiGroup(object):
                 queue=False,
             )
 
-        ControlNetUiGroup.a1111_context.img2img_batch_output_dir.blur(
-            fn=lambda a: a,
-            inputs=[ControlNetUiGroup.a1111_context.img2img_batch_output_dir],
-            outputs=[self.output_dir_state],
-            queue=False,
-        )
+        output_dir = ControlNetUiGroup.a1111_context.img2img_batch_output_dir
+        if output_dir is not None:
+            output_dir.blur(
+                fn=lambda a: a,
+                inputs=[output_dir],
+                outputs=[self.output_dir_state],
+                queue=False,
+            )
 
     def register_clear_preview(self):
         def clear_preview(x):
