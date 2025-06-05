@@ -1,4 +1,8 @@
-"""Forge-specific UI entry to manage presets and hardware parameters."""
+"""Forge-specific UI entry to manage presets and hardware parameters.
+
+The preset callbacks in this module check for missing UI components before
+registering with Gradio. This avoids ``NoneType`` errors during startup.
+"""
 
 import os
 import logging
