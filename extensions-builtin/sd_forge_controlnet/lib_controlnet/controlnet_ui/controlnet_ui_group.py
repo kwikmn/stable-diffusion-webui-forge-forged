@@ -620,10 +620,18 @@ class ControlNetUiGroup(object):
             else:
                 return gr.Slider.update(), gr.Slider.update()
 
-        self.send_dimen_button.click(
+        button = self.send_dimen_button
+        width_slider = self.width_slider
+        height_slider = self.height_slider
+        background = getattr(self.image, "background", None)
+        # Skip registration if required components are missing
+        if not all([button, width_slider, height_slider, background]):
+            return
+
+        button.click(
             fn=send_dimensions,
-            inputs=[self.image.background],
-            outputs=[self.width_slider, self.height_slider],
+            inputs=[background],
+            outputs=[width_slider, height_slider],
             show_progress=False,
         )
 
@@ -955,6 +963,8 @@ class ControlNetUiGroup(object):
             ControlNetUiGroup.global_batch_input_dir,
             ControlNetUiGroup.a1111_context.img2img_batch_input_dir,
         ]
+        batch_dirs = [d for d in batch_dirs if d is not None]
+
         for batch_dir_comp in batch_dirs:
             subscriber = getattr(batch_dir_comp, "blur", None)
             if subscriber is None:
@@ -966,12 +976,14 @@ class ControlNetUiGroup(object):
                 queue=False,
             )
 
-        ControlNetUiGroup.a1111_context.img2img_batch_output_dir.blur(
-            fn=lambda a: a,
-            inputs=[ControlNetUiGroup.a1111_context.img2img_batch_output_dir],
-            outputs=[self.output_dir_state],
-            queue=False,
-        )
+        output_dir = ControlNetUiGroup.a1111_context.img2img_batch_output_dir
+        if output_dir is not None:
+            output_dir.blur(
+                fn=lambda a: a,
+                inputs=[output_dir],
+                outputs=[self.output_dir_state],
+                queue=False,
+            )
 
     def register_clear_preview(self):
         def clear_preview(x):
