@@ -329,7 +329,10 @@ def forge_main_entry():
     ]
 
     # Filter out components that failed to load
+    missing_components = len([c for c in output_targets if c is None])
     output_targets = [c for c in output_targets if c is not None]
+    if missing_components:
+        logger.warning("%d preset UI components missing", missing_components)
 
     if output_targets:
         ui_forge_preset.change(on_preset_change, inputs=[ui_forge_preset], outputs=output_targets, queue=False, show_progress=False)

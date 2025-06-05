@@ -2,6 +2,7 @@ from __future__ import annotations
 import base64
 import io
 import json
+import logging
 import os
 import re
 import sys
@@ -13,6 +14,8 @@ from PIL import Image
 
 from modules_forge import main_entry
 from ast import literal_eval
+
+logger = logging.getLogger(__name__)
 
 sys.modules['modules.generation_parameters_copypaste'] = sys.modules[__name__]  # alias for old name
 
@@ -47,7 +50,12 @@ class PasteField(tuple):
         self.function = target if callable(target) else None
 
 
-paste_fields: dict[str, dict] = {}
+paste_fields: dict[str, dict] = {
+    "txt2img": {"init_img": None, "fields": [], "override_settings_component": None},
+    "img2img": {"init_img": None, "fields": [], "override_settings_component": None},
+    "inpaint": {"init_img": None, "fields": [], "override_settings_component": None},
+    "extras": {"init_img": None, "fields": [], "override_settings_component": None},
+}
 registered_param_bindings: list[ParamBinding] = []
 
 # Fields used by UI tabs for pasting generation parameters. These are
@@ -60,6 +68,12 @@ img2img_paste_fields: list[PasteField] = []
 
 def reset():
     paste_fields.clear()
+    paste_fields.update({
+        "txt2img": {"init_img": None, "fields": [], "override_settings_component": None},
+        "img2img": {"init_img": None, "fields": [], "override_settings_component": None},
+        "inpaint": {"init_img": None, "fields": [], "override_settings_component": None},
+        "extras": {"init_img": None, "fields": [], "override_settings_component": None},
+    })
     registered_param_bindings.clear()
 
 
@@ -161,7 +175,7 @@ def connect_paste_params_buttons():
     for binding in registered_param_bindings:
         tab_fields = paste_fields.get(binding.tabname)
         if tab_fields is None:
-            print(f"Warning: No paste fields registered for {binding.tabname}")
+            logger.warning("No paste fields registered for %s", binding.tabname)
             continue
 
         destination_image_component = tab_fields["init_img"]
@@ -195,7 +209,7 @@ def connect_paste_params_buttons():
             paste_field_names = ['Prompt', 'Negative prompt', 'Steps', 'Face restoration'] + (["Seed"] if shared.opts.send_seed else []) + binding.paste_field_names
             source_fields = paste_fields.get(binding.source_tabname, {}).get("fields")
             if source_fields is None:
-                print(f"Warning: No paste fields registered for {binding.source_tabname}")
+                logger.warning("No paste fields registered for %s", binding.source_tabname)
             else:
                 binding.paste_button.click(
                     fn=lambda *x: x,
