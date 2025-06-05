@@ -1,13 +1,15 @@
 import inspect
-import types
 import warnings
 from functools import wraps
+import logging
 
 import gradio as gr
 import gradio.component_meta
 
 
 from modules import scripts, ui_tempdir, patches
+
+logger = logging.getLogger(__name__)
 
 
 class GradioDeprecationWarning(DeprecationWarning):
@@ -120,6 +122,30 @@ class EventWrapper:
         if '_js' in kwargs:
             kwargs['js'] = kwargs['_js']
             del kwargs['_js']
+
+        def _filter(x):
+            if x is None:
+                return None
+            if isinstance(x, (list, tuple)):
+                return [i for i in x if i is not None]
+            return x
+
+        if len(args) >= 2:
+            args = list(args)
+            args[1] = _filter(args[1])
+            if len(args) >= 3:
+                args[2] = _filter(args[2])
+            args = tuple(args)
+
+        if 'inputs' in kwargs:
+            kwargs['inputs'] = _filter(kwargs['inputs'])
+        if 'outputs' in kwargs:
+            kwargs['outputs'] = _filter(kwargs['outputs'])
+
+        if self.replaced_event is None:
+            logger.warning("Skipping event registration because replaced_event is None")
+            return None
+
         return self.replaced_event(*args, **kwargs)
 
     @property
