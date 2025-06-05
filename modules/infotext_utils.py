@@ -49,6 +49,13 @@ class PasteField(tuple):
 paste_fields: dict[str, dict] = {}
 registered_param_bindings: list[ParamBinding] = []
 
+# Fields used by UI tabs for pasting generation parameters. These are
+# populated when the UI is created and are kept here so other modules can
+# reference them directly.  They default to empty lists to avoid attribute
+# errors during startup when the UI has not yet called `add_paste_fields`.
+txt2img_paste_fields: list[PasteField] = []
+img2img_paste_fields: list[PasteField] = []
+
 
 def reset():
     paste_fields.clear()
@@ -123,8 +130,10 @@ def add_paste_fields(tabname, init_img, fields, override_settings_component=None
     import modules.ui
     if tabname == 'txt2img':
         modules.ui.txt2img_paste_fields = fields
+        globals()['txt2img_paste_fields'] = fields
     elif tabname == 'img2img':
         modules.ui.img2img_paste_fields = fields
+        globals()['img2img_paste_fields'] = fields
 
 
 def create_buttons(tabs_list):
