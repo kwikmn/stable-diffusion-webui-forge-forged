@@ -1,4 +1,7 @@
+"""Forge-specific UI entry to manage presets and hardware parameters."""
+
 import os
+import logging
 import torch
 import gradio as gr
 
@@ -10,6 +13,7 @@ from modules.shared import cmd_opts
 
 
 total_vram = int(memory_management.total_vram)
+logger = logging.getLogger(__name__)
 
 ui_forge_preset: gr.Radio = None
 
@@ -85,7 +89,7 @@ def make_checkpoint_manager_ui():
         a, b = refresh_models()
         return gr.update(choices=a), gr.update(choices=b)
 
-    refresh_button = ui_common.ToolButton(value=ui_common.refresh_symbol, elem_id=f"forge_refresh_checkpoint", tooltip="Refresh")
+    refresh_button = ui_common.ToolButton(value=ui_common.refresh_symbol, elem_id="forge_refresh_checkpoint", tooltip="Refresh")
     refresh_button.click(
         fn=gr_refresh_models,
         inputs=[],
@@ -146,7 +150,7 @@ def refresh_models():
     file_extensions = ['ckpt', 'pt', 'bin', 'safetensors', 'gguf']
 
     module_list.clear()
-    
+
     module_paths = [
         os.path.abspath(os.path.join(paths.models_path, "VAE")),
         os.path.abspath(os.path.join(paths.models_path, "text_encoder")),
@@ -262,7 +266,7 @@ def modules_change(module_values:list, save=True, refresh=True) -> bool:
         module_name = os.path.basename(v) # If the input is a filepath, extract the file name
         if module_name in module_list:
             modules.append(module_list[module_name])
-    
+
     # skip further processing if value unchanged
     if sorted(modules) == sorted(shared.opts.data.get('forge_additional_modules', [])):
         return False
@@ -277,10 +281,12 @@ def modules_change(module_values:list, save=True, refresh=True) -> bool:
 
 
 def get_a1111_ui_component(tab, label):
-    fields = infotext_utils.paste_fields[tab]['fields']
+    fields = infotext_utils.paste_fields.get(tab, {}).get('fields', [])
     for f in fields:
-        if f.label == label or f.api == label:
+        if getattr(f, 'label', None) == label or getattr(f, 'api', None) == label:
             return f.component
+    logger.warning("UI component %s for tab %s not found", label, tab)
+    return None
 
 
 def forge_main_entry():
@@ -324,9 +330,18 @@ def forge_main_entry():
         ui_txt2img_hr_distilled_cfg,
     ]
 
-    ui_forge_preset.change(on_preset_change, inputs=[ui_forge_preset], outputs=output_targets, queue=False, show_progress=False)
-    ui_forge_preset.change(js="clickLoraRefresh", fn=None, queue=False, show_progress=False)
-    Context.root_block.load(on_preset_change, inputs=None, outputs=output_targets, queue=False, show_progress=False)
+    # Filter out components that failed to load
+    missing_components = len([c for c in output_targets if c is None])
+    output_targets = [c for c in output_targets if c is not None]
+    if missing_components:
+        logger.warning("%d preset UI components missing", missing_components)
+
+    if output_targets:
+        ui_forge_preset.change(on_preset_change, inputs=[ui_forge_preset], outputs=output_targets, queue=False, show_progress=False)
+        ui_forge_preset.change(js="clickLoraRefresh", fn=None, queue=False, show_progress=False)
+        Context.root_block.load(on_preset_change, inputs=None, outputs=output_targets, queue=False, show_progress=False)
+    else:
+        logger.warning("No preset UI components available; preset change callbacks not registered")
 
     refresh_model_loading_parameters()
     return
