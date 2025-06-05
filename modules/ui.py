@@ -231,7 +231,19 @@ def create_output_panel(tabname,outdir,toprow=None):
         dummy_component_for_save = gr.Textbox(visible=False,elem_id=f"{tabname}_dummy_component_for_save")
         save_button.click(fn=wrap_gradio_call(ui_common.save_files,extra_outputs=[generation_info,html_log]),_js="gallery_save_files",inputs=[dummy_component_for_save,result_gallery,generation_info,html_log,],outputs=[html_log,],show_progress=False)
         zip_button.click(fn=wrap_gradio_call(ui_common.save_files,extra_outputs=[generation_info,html_log]),_js="gallery_save_files_zip",inputs=[dummy_component_for_save,result_gallery,generation_info,html_log,],outputs=[html_log,],show_progress=False) # Corrected fn to ui_common.save_files
-        return OutputPanel(gallery=result_gallery,generation_info=generation_info,infotext=infotext,html_log=html_log,save_button=save_button,zip_button=zip_button,button_upscale=ToolButton(value="Upscale",visible=False),button_live_preview=ToolButton(value="Live Preview",visible=False),button_skip=ToolButton(value='Skip',elem_id=f"{tabname}_skip",visible=False),button_interrupt=ToolButton(value='Interrupt',elem_id=f"{tabname}_interrupt",visible=False),button_stop_generating=ToolButton(value='Stop',elem_id=f"{tabname}_stop_generating",visible=False))
+        panel = OutputPanel()
+        panel.gallery = result_gallery
+        panel.generation_info = generation_info
+        panel.infotext = infotext
+        panel.html_log = html_log
+        panel.save_button = save_button
+        panel.zip_button = zip_button
+        panel.button_upscale = ToolButton(value="Upscale",visible=False)
+        panel.button_live_preview = ToolButton(value="Live Preview",visible=False)
+        panel.button_skip = ToolButton(value='Skip',elem_id=f"{tabname}_skip",visible=False)
+        panel.button_interrupt = ToolButton(value='Interrupt',elem_id=f"{tabname}_interrupt",visible=False)
+        panel.button_stop_generating = ToolButton(value='Stop',elem_id=f"{tabname}_stop_generating",visible=False)
+        return panel
 def ordered_ui_categories():
     user_order = {x.strip():i*2+1 for i,x in enumerate(shared.opts.ui_reorder_list)}
     for _,category in sorted(enumerate(shared_items.ui_reorder_categories()),key=lambda x:user_order.get(x[1],x[0]*2+0)): yield category
