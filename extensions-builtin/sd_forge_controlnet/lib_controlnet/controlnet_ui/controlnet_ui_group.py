@@ -620,10 +620,18 @@ class ControlNetUiGroup(object):
             else:
                 return gr.Slider.update(), gr.Slider.update()
 
-        self.send_dimen_button.click(
+        button = self.send_dimen_button
+        width_slider = self.width_slider
+        height_slider = self.height_slider
+        background = getattr(self.image, "background", None)
+        # Skip registration if required components are missing
+        if not all([button, width_slider, height_slider, background]):
+            return
+
+        button.click(
             fn=send_dimensions,
-            inputs=[self.image.background],
-            outputs=[self.width_slider, self.height_slider],
+            inputs=[background],
+            outputs=[width_slider, height_slider],
             show_progress=False,
         )
 
