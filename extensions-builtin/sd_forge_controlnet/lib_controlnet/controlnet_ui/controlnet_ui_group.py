@@ -806,20 +806,26 @@ class ControlNetUiGroup(object):
                 *self.openpose_editor.update(json_acceptor.value),
             )
 
+        inputs = [
+            getattr(self.image, "background", None),
+            getattr(self.image, "foreground", None),
+            self.module,
+            self.processor_res,
+            self.threshold_a,
+            self.threshold_b,
+            self.width_slider,
+            self.height_slider,
+            self.pixel_perfect,
+            self.resize_mode,
+        ]
+
+        if self.trigger_preprocessor is None or any(i is None for i in inputs) or self.generated_image is None:
+            logger.warning("Skipping register_run_annotator due to missing components")
+            return
+
         self.trigger_preprocessor.click(
             fn=run_annotator,
-            inputs=[
-                self.image.background,
-                self.image.foreground,
-                self.module,
-                self.processor_res,
-                self.threshold_a,
-                self.threshold_b,
-                self.width_slider,
-                self.height_slider,
-                self.pixel_perfect,
-                self.resize_mode,
-            ],
+            inputs=inputs,
             outputs=[
                 self.generated_image.block,
                 self.generated_image.background,
