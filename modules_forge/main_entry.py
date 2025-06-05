@@ -335,6 +335,7 @@ def forge_main_entry():
         logger.warning("%d preset UI components missing", missing_components)
 
 uakdae-codex/troubleshoot-gradio-callback-errors
+def refresh_model_loading_parameters():
     if output_targets:
         ui_forge_preset.change(on_preset_change, inputs=[ui_forge_preset], outputs=output_targets, queue=False, show_progress=False)
         ui_forge_preset.change(js="clickLoraRefresh", fn=None, queue=False, show_progress=False)
@@ -342,13 +343,9 @@ uakdae-codex/troubleshoot-gradio-callback-errors
     else:
         logger.warning("No preset UI components available; preset change callbacks not registered")
 
-    ui_forge_preset.change(on_preset_change, inputs=[ui_forge_preset], outputs=output_targets, queue=False, show_progress=False)
-    ui_forge_preset.change(js="clickLoraRefresh", fn=None, queue=False, show_progress=False)
-    Context.root_block.load(on_preset_change, inputs=None, outputs=output_targets, queue=False, show_progress=False)
-
-
     refresh_model_loading_parameters()
     return
+
 
 
 def on_preset_change(preset=None):
