@@ -2,6 +2,7 @@ from __future__ import annotations
 import base64
 import io
 import json
+import logging
 import os
 import re
 import sys
@@ -12,6 +13,9 @@ from modules import shared, ui_tempdir, script_callbacks, processing, infotext_v
 from PIL import Image
 
 from modules_forge import main_entry
+from ast import literal_eval
+
+logger = logging.getLogger(__name__)
 
 sys.modules['modules.generation_parameters_copypaste'] = sys.modules[__name__]  # alias for old name
 
@@ -158,9 +162,14 @@ def register_paste_params_button(binding: ParamBinding):
 
 def connect_paste_params_buttons():
     for binding in registered_param_bindings:
-        destination_image_component = paste_fields[binding.tabname]["init_img"]
-        fields = paste_fields[binding.tabname]["fields"]
-        override_settings_component = binding.override_settings_component or paste_fields[binding.tabname]["override_settings_component"]
+        tab_fields = paste_fields.get(binding.tabname)
+        if tab_fields is None:
+            logger.warning("No paste fields registered for %s", binding.tabname)
+            continue
+
+        destination_image_component = tab_fields["init_img"]
+        fields = tab_fields["fields"]
+        override_settings_component = binding.override_settings_component or tab_fields["override_settings_component"]
 
         destination_width_component = next(iter([field for field, name in fields if name == "Size-1"] if fields else []), None)
         destination_height_component = next(iter([field for field, name in fields if name == "Size-2"] if fields else []), None)
@@ -187,12 +196,16 @@ def connect_paste_params_buttons():
 
         if binding.source_tabname is not None and fields is not None:
             paste_field_names = ['Prompt', 'Negative prompt', 'Steps', 'Face restoration'] + (["Seed"] if shared.opts.send_seed else []) + binding.paste_field_names
-            binding.paste_button.click(
-                fn=lambda *x: x,
-                inputs=[field for field, name in paste_fields[binding.source_tabname]["fields"] if name in paste_field_names],
-                outputs=[field for field, name in fields if name in paste_field_names],
-                show_progress=False,
-            )
+            source_fields = paste_fields.get(binding.source_tabname, {}).get("fields")
+            if source_fields is None:
+                logger.warning("No paste fields registered for %s", binding.source_tabname)
+            else:
+                binding.paste_button.click(
+                    fn=lambda *x: x,
+                    inputs=[field for field, name in source_fields if name in paste_field_names],
+                    outputs=[field for field, name in fields if name in paste_field_names],
+                    show_progress=False,
+                )
 
         binding.paste_button.click(
             fn=None,
@@ -498,7 +511,6 @@ infotext_to_setting_name_mapping = [
     ('Schedule type', 'k_sched_type'),
 ]
 """
-from ast import literal_eval
 def create_override_settings_dict(text_pairs):
     """creates processing's override_settings parameters from gradio's multiselect
 
