@@ -50,7 +50,12 @@ class PasteField(tuple):
         self.function = target if callable(target) else None
 
 
-paste_fields: dict[str, dict] = {}
+paste_fields: dict[str, dict] = {
+    "txt2img": {"init_img": None, "fields": [], "override_settings_component": None},
+    "img2img": {"init_img": None, "fields": [], "override_settings_component": None},
+    "inpaint": {"init_img": None, "fields": [], "override_settings_component": None},
+    "extras": {"init_img": None, "fields": [], "override_settings_component": None},
+}
 registered_param_bindings: list[ParamBinding] = []
 
 # Fields used by UI tabs for pasting generation parameters. These are
@@ -63,6 +68,12 @@ img2img_paste_fields: list[PasteField] = []
 
 def reset():
     paste_fields.clear()
+    paste_fields.update({
+        "txt2img": {"init_img": None, "fields": [], "override_settings_component": None},
+        "img2img": {"init_img": None, "fields": [], "override_settings_component": None},
+        "inpaint": {"init_img": None, "fields": [], "override_settings_component": None},
+        "extras": {"init_img": None, "fields": [], "override_settings_component": None},
+    })
     registered_param_bindings.clear()
 
 
