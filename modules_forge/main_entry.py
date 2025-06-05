@@ -328,6 +328,12 @@ def forge_main_entry():
         ui_txt2img_hr_distilled_cfg,
     ]
 
+    # Filter out components that failed to load
+    missing_components = len([c for c in output_targets if c is None])
+    output_targets = [c for c in output_targets if c is not None]
+    if missing_components:
+        logger.warning("%d preset UI components missing", missing_components)
+
     ui_forge_preset.change(on_preset_change, inputs=[ui_forge_preset], outputs=output_targets, queue=False, show_progress=False)
     ui_forge_preset.change(js="clickLoraRefresh", fn=None, queue=False, show_progress=False)
     Context.root_block.load(on_preset_change, inputs=None, outputs=output_targets, queue=False, show_progress=False)
