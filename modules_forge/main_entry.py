@@ -1,3 +1,5 @@
+"""Forge-specific UI entry to manage presets and hardware parameters."""
+
 import os
 import logging
 import torch
